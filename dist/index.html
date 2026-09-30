@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#183c39">
+  <title>Lumière Hotel | Quản lý khách sạn</title>
+  <style>
+    :root{font-family:"Segoe UI",Tahoma,sans-serif;color:#183c39;background:#f5f7f5;font-synthesis:none;--ink:#183c39;--muted:#728783;--line:#e0e9e5;--teal:#16766b;--pale:#e8f3ef;--gold:#d2a454;--coral:#d97668;--white:#fff;--shadow:0 14px 38px #193d3920}*{box-sizing:border-box}body{margin:0;min-width:320px}button,input,select,textarea{font:inherit}button{border:0;background:none;color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #98d1c2;outline-offset:2px}.hidden{display:none!important}.muted{color:var(--muted)}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);font-weight:700}.primary,.secondary,.danger,.icon-button{border-radius:7px;padding:10px 13px;font-weight:650;font-size:12px}.primary{background:var(--teal);color:#fff}.primary:hover{background:#105e55}.secondary{border:1px solid var(--line);background:#fff}.danger{background:#fff0ed;color:#b84f43}.icon-button{width:36px;height:36px;padding:0;border:1px solid var(--line);background:#fff;font-size:16px}.field{display:grid;gap:6px;font-size:11px;color:var(--muted);font-weight:600}.field input,.field select,.field textarea,.toolbar input,.toolbar select{width:100%;border:1px solid var(--line);background:#fff;border-radius:7px;padding:10px;color:var(--ink);font-size:12px}.field textarea{min-height:90px;resize:vertical}.stack{display:grid;gap:13px}.row{display:flex;align-items:center;gap:10px}.space{justify-content:space-between}.badge{display:inline-flex;align-items:center;border-radius:30px;padding:5px 9px;background:var(--pale);color:var(--teal);font-size:10px;font-weight:700}.badge.warn{background:#fff3df;color:#9c6b20}.badge.bad{background:#fff0ed;color:#b84f43}.badge.gray{background:#eef1ef;color:#657873}.app-shell{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:#fff;border-right:1px solid var(--line);padding:23px 15px;display:flex;flex-direction:column;z-index:10}.brand{display:flex;align-items:center;gap:11px;padding:0 10px 27px;font-weight:800;letter-spacing:1.1px}.brand-mark{width:35px;height:35px;border-radius:10px;background:var(--ink);color:var(--gold);display:grid;place-items:center;font-family:Georgia,serif;font-size:22px}.brand small{display:block;color:#9aaba6;letter-spacing:1.5px;font-size:8px;margin-top:3px}.nav-label{padding:11px 11px 6px;color:#9aaba6;font-size:9px;text-transform:uppercase;letter-spacing:1.4px}.nav-list{display:grid;gap:3px}.nav-list button{width:100%;display:flex;align-items:center;gap:11px;padding:10px 11px;text-align:left;border-radius:7px;color:#637b75;font-size:12px}.nav-list button:hover,.nav-list button.active{background:var(--pale);color:var(--teal);font-weight:700}.nav-symbol{width:20px;text-align:center;font-size:15px}.side-bottom{margin-top:auto;border-top:1px solid var(--line);padding:15px 9px 0;font-size:11px}.main-area{margin-left:245px;min-height:100vh}.topbar{height:67px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}.topbar-title{font-size:12px;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:12px}.user-chip{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650}.avatar{display:grid;place-items:center;width:31px;height:31px;border-radius:50%;background:#e1efe9;color:var(--teal);font-weight:750}.page-wrap{max-width:1440px;margin:auto;padding:32px}.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:23px}.page-head h1{font:500 29px Georgia,serif;margin:6px 0}.page-head p{margin:0;color:var(--muted);font-size:12px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.stat,.panel,.room-card,.service-row,.booking-row{background:#fff;border:1px solid var(--line);border-radius:8px}.stat{padding:17px}.stat small{display:block;color:var(--muted);font-size:10px}.stat strong{display:block;font:500 25px Georgia,serif;margin:10px 0 5px}.stat span{font-size:10px;color:var(--teal)}.grid-2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.panel{padding:19px;margin-bottom:16px}.panel h2{font:500 19px Georgia,serif;margin:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;text-align:left;font-size:11px}th{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:#92a29e;font-weight:650}th,td{padding:12px 9px;border-bottom:1px solid #edf1ef;white-space:nowrap}td strong{font-size:11px}.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:15px}.toolbar input{max-width:290px}.room-grid,.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.room-card{overflow:hidden}.room-art{height:92px;padding:15px;background:linear-gradient(125deg,#dae9e2,#f4e8d4);display:flex;align-items:flex-end;justify-content:space-between;color:#41665c}.room-art span:first-child{font:500 22px Georgia,serif}.room-body{padding:15px}.room-body h3{font:500 17px Georgia,serif;margin:0 0 5px}.room-meta{font-size:10px;color:var(--muted);line-height:1.8}.room-price{font-weight:750;font-size:13px;margin:12px 0}.room-actions{display:flex;gap:7px;flex-wrap:wrap}.service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-row{padding:15px;display:flex;align-items:center;gap:12px}.service-icon{width:40px;height:40px;border-radius:8px;background:#eef5f1;display:grid;place-items:center;font-size:19px}.service-row main{flex:1}.service-row strong,.service-row small{display:block}.service-row small{font-size:10px;color:var(--muted);margin-top:4px}.booking-row{padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}.booking-row main{flex:1;min-width:180px}.booking-row strong,.booking-row small{display:block}.booking-row small{color:var(--muted);font-size:10px;margin-top:4px}.booking-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.empty{padding:30px;text-align:center;color:var(--muted);font-size:12px}.notice{background:#edf5f1;border-left:3px solid var(--teal);padding:12px 14px;color:#5e7d73;font-size:11px;line-height:1.55;border-radius:4px}.auth-screen{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;background:#f7f7f3}.auth-visual{padding:7vw;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(145deg,#183c39,#286b5d 70%,#bf9251)}.auth-visual h1{font:500 clamp(38px,5vw,68px) Georgia,serif;max-width:570px;margin:16px 0}.auth-visual p{max-width:440px;font-size:14px;line-height:1.7;color:#e3eeea}.auth-form-side{display:grid;place-items:center;padding:35px}.auth-box{width:min(390px,100%)}.auth-box h2{font:500 31px Georgia,serif;margin:8px 0}.role-switch{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:20px 0}.role-switch button{padding:10px 6px;border:1px solid var(--line);border-radius:6px;font-size:11px;color:var(--muted)}.role-switch button.selected{border-color:#9cc8ba;background:var(--pale);color:var(--teal);font-weight:700}.auth-links{display:flex;justify-content:space-between;gap:10px;margin-top:17px;font-size:11px}.text-button{color:var(--teal);font-weight:650}.overlay{position:fixed;inset:0;background:#102d2a91;display:grid;place-items:center;padding:16px;z-index:40}.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:10px;padding:22px;box-shadow:var(--shadow)}.modal h2{font:500 23px Georgia,serif;margin:0 0 17px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid .wide{grid-column:1/-1}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;right:20px;top:80px;background:#183c39;color:#fff;padding:12px 16px;border-radius:7px;box-shadow:var(--shadow);font-size:12px;z-index:60}.chat-wrap{position:fixed;right:23px;bottom:20px;z-index:30}.chat-toggle{border-radius:30px;background:var(--ink);color:white;padding:12px 16px;box-shadow:var(--shadow);display:flex;gap:9px;align-items:center;font-size:12px;font-weight:700}.chat-toggle span:first-child{color:var(--gold);font-size:17px}.chat-panel{width:min(370px,calc(100vw - 30px));height:440px;max-height:calc(100vh - 100px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}.chat-head{background:var(--ink);color:#fff;padding:13px 15px;display:flex;justify-content:space-between;align-items:center}.chat-head strong,.chat-head small{display:block}.chat-head small{font-size:9px;color:#bcd5cd;margin-top:3px}.chat-log{padding:13px;background:#f5f8f6;overflow:auto;flex:1;display:flex;flex-direction:column;gap:8px}.chat-message{max-width:88%;font-size:11px;line-height:1.55;padding:9px 11px;border-radius:10px;white-space:pre-wrap}.chat-message.ai{background:#fff;border:1px solid var(--line);align-self:flex-start}.chat-message.user{background:#deeee8;align-self:flex-end}.suggestions{display:flex;overflow:auto;gap:6px;padding:8px}.suggestions button{white-space:nowrap;border:1px solid #d5e7df;border-radius:20px;padding:6px 9px;font-size:9px;color:var(--teal)}.chat-form{display:flex;gap:7px;padding:9px;border-top:1px solid var(--line)}.chat-form input{flex:1;min-width:0;border:1px solid var(--line);border-radius:6px;padding:10px;font-size:11px}.chat-form button{background:var(--teal);color:#fff;border-radius:6px;padding:0 13px}.mobile-menu{display:none}.rating{color:#c68a3d;font-size:13px}.metric-list{display:grid;gap:12px}.metric-line{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:11px}.metric-line strong{white-space:nowrap}.check-row{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+    @media(max-width:1100px){.room-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.page-wrap{padding:26px 22px}}
+    @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .18s;width:260px;box-shadow:var(--shadow)}.sidebar.open{transform:translateX(0)}.main-area{margin:0}.topbar{height:59px;padding:0 15px}.mobile-menu{display:inline-grid}.topbar-title{display:none}.page-wrap{padding:22px 15px 90px}.page-head{align-items:flex-start;flex-direction:column}.page-head h1{font-size:26px}.grid-2{grid-template-columns:1fr}.room-grid,.service-grid{grid-template-columns:1fr}.auth-screen{grid-template-columns:1fr}.auth-visual{display:none}.auth-form-side{min-height:100vh;padding:24px}.auth-box{align-self:start;padding-top:18px}.auth-box h2{font-size:27px}.booking-row{align-items:flex-start}.booking-actions{width:100%}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.chat-wrap{right:12px;bottom:12px}.chat-panel{height:min(440px,calc(100vh - 90px))}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:21px}}
+  </style>
+  <style>
+    .hotel-site{background:#f8f8f4;color:#193a35}.site-nav{height:76px;padding:0 clamp(18px,6vw,90px);display:flex;align-items:center;justify-content:space-between;background:#fbfbf8;position:sticky;top:0;z-index:12;border-bottom:1px solid #e6e9e2}.site-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}.site-brand .brand-mark{width:39px;height:39px}.site-links{display:flex;align-items:center;gap:clamp(15px,3vw,38px)}.site-links a,.site-staff{font-size:11px;color:#526b64;text-decoration:none}.site-links a:hover{color:#16766b}.site-staff{border:1px solid #dce5df;border-radius:4px;padding:10px 13px;background:transparent}.site-hero{height:min(670px,76vh);min-height:540px;position:relative;display:flex;align-items:flex-end;color:#fff;background:#203b35;overflow:hidden}.site-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 57%}.site-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#102b26c7 0%,#102b2675 44%,#102b2610 100%)}.hero-copy{position:relative;z-index:1;padding:0 clamp(24px,9vw,135px) 100px;max-width:900px}.hero-copy .eyebrow{color:#e6c780}.hero-copy h1{font:500 clamp(48px,7vw,91px) Georgia,serif;line-height:.98;margin:16px 0 18px;max-width:820px}.hero-copy p{font-size:14px;line-height:1.8;color:#e3ebe6;max-width:500px;margin:0}.hero-mark{position:absolute;right:8%;top:17%;z-index:1;color:#f5e8ca;border:1px solid #ffffff75;width:80px;height:80px;border-radius:50%;display:grid;place-items:center;font:30px Georgia,serif}.site-booking{position:relative;z-index:2;width:min(1000px,calc(100% - 40px));margin:-42px auto 0;background:#fff;box-shadow:0 12px 38px #1d3b3321;padding:19px 22px;display:grid;grid-template-columns:1.2fr 1.2fr .8fr auto;gap:13px;align-items:end}.site-booking label{display:grid;gap:7px;font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#84938c}.site-booking input,.site-booking select{height:42px;width:100%;border:1px solid #e1e7e1;border-radius:3px;background:#fff;color:#25463d;padding:0 10px;font-size:12px}.site-booking button{height:42px;min-width:150px;border-radius:3px;background:#183c39;color:#fff;padding:0 18px;font-size:11px}.site-strip{display:flex;align-items:center;justify-content:center;gap:38px;padding:23px 20px;color:#61776d;font-size:10px;border-bottom:1px solid #e8ebe4}.site-strip span{display:flex;align-items:center;gap:8px}.site-strip b{font:20px Georgia,serif;color:#c79c52;font-weight:400}.site-section{padding:88px clamp(20px,8vw,112px);scroll-margin-top:80px}.site-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:28px}.site-section-head h2,.site-story h2,.site-reviews h2{font:500 clamp(30px,4vw,47px) Georgia,serif;margin:9px 0 0;line-height:1.08}.site-section-head p{max-width:370px;color:#788880;font-size:12px;line-height:1.7;margin:0}.site-room-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.site-room{background:#fff;border:1px solid #e6e9e2}.site-room img{width:100%;height:218px;display:block;object-fit:cover;background:#e8ebe4}.site-room-body{padding:17px}.site-room-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.site-room h3{font:500 21px Georgia,serif;margin:0}.site-room p{font-size:10px;color:#839089;line-height:1.7;min-height:35px}.site-room-price{font-size:13px;font-weight:700;color:#193a35}.site-room-price small{font-size:9px;color:#839089;font-weight:400}.site-room .primary{margin-top:13px;width:100%;border-radius:3px;height:40px}.site-story{display:grid;grid-template-columns:1fr 1fr;background:#e9eee8;min-height:390px}.site-story img{width:100%;height:100%;min-height:390px;object-fit:cover}.site-story-copy{align-self:center;padding:45px clamp(24px,6vw,86px)}.site-story-copy p{font-size:12px;line-height:1.9;color:#6b7d73;max-width:480px}.site-story-copy .secondary{margin-top:12px;border-radius:3px}.site-service-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #dfe5dc}.site-service{padding:20px 14px;border-bottom:1px solid #dfe5dc;min-height:107px}.site-service .service-icon{margin-bottom:10px;background:transparent;padding:0;width:auto;height:auto}.site-service strong,.site-service small{display:block}.site-service strong{font:500 16px Georgia,serif}.site-service small{font-size:10px;color:#829087;margin-top:6px}.site-reviews{background:#193d37;color:#fff;padding:72px clamp(20px,8vw,112px);display:grid;grid-template-columns:.75fr 1.25fr;gap:35px;align-items:center}.site-reviews .eyebrow{color:#e3c479}.site-reviews h2{font-size:39px}.review-quote{font:italic 22px/1.6 Georgia,serif;color:#f1f1e7}.review-byline{font-size:10px;color:#b8cbc2;margin-top:17px}.site-contact{padding:65px 22px;display:flex;align-items:center;justify-content:space-between;gap:24px;background:#e8eee8}.site-contact h2{font:500 34px Georgia,serif;margin:7px 0}.site-contact p{font-size:11px;color:#718178}.site-contact .primary{border-radius:3px;padding:14px 23px}.site-footer{background:#142f2b;color:#c9d5ce;padding:28px clamp(20px,7vw,92px);display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:10px}.site-footer button{color:#d8c38b;font-size:10px}.site-empty{grid-column:1/-1;border:1px solid #e2e8e1;background:#fff;padding:30px;text-align:center;color:#6f8177;font-size:12px}.site-chat-note{display:none}
+    @media(max-width:850px){.site-links{gap:14px}.site-links a{font-size:10px}.site-staff{padding:8px}.site-room-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.site-service-list{grid-template-columns:repeat(2,minmax(0,1fr))}.site-booking{grid-template-columns:1fr 1fr}.site-booking button{width:100%}.site-story{grid-template-columns:1fr}.site-story img{max-height:300px;min-height:250px}.site-reviews{grid-template-columns:1fr;gap:15px}}
+    @media(max-width:560px){.site-nav{height:62px;padding:0 15px}.site-links a:not(:last-of-type){display:none}.site-links{gap:8px}.site-staff{font-size:9px}.site-hero{height:66vh;min-height:480px}.site-hero>img{object-position:60% center}.site-hero:after{background:linear-gradient(0deg,#102b26c9 0%,#102b2670 53%,#102b2630 100%)}.hero-copy{padding:0 22px 85px}.hero-copy h1{font-size:52px}.hero-copy p{font-size:12px}.hero-mark{width:57px;height:57px;right:20px;top:22%;font-size:23px}.site-booking{margin-top:-34px;width:calc(100% - 24px);padding:14px;gap:9px}.site-booking label{font-size:8px}.site-booking button{grid-column:1/-1}.site-strip{gap:14px;justify-content:space-around;font-size:8px;padding:17px 8px}.site-strip b{font-size:16px}.site-section{padding:57px 16px}.site-section-head{align-items:flex-start;flex-direction:column;gap:10px}.site-section-head h2{font-size:34px}.site-room-grid{grid-template-columns:1fr}.site-room img{height:225px}.site-service-list{grid-template-columns:1fr 1fr}.site-service{padding:15px 8px;min-height:100px}.site-service strong{font-size:14px}.site-reviews{padding:52px 21px}.site-reviews h2{font-size:32px}.review-quote{font-size:18px}.site-contact{padding:42px 20px;align-items:flex-start;flex-direction:column}.site-contact h2{font-size:29px}.site-footer{align-items:flex-start;flex-direction:column}.site-booking input,.site-booking select{font-size:11px}}
+  </style>
+  <style>
+    :root{--font-body:"Segoe UI Variable","Segoe UI",Arial,sans-serif;--font-display:"Palatino Linotype","Book Antiqua",Georgia,serif;font-family:var(--font-body);font-size:16px;line-height:1.5;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-kerning:normal}
+    body,button,input,select,textarea{font-family:var(--font-body)}
+    h1,h2,h3,.hero-copy h1,.site-section-head h2,.site-story h2,.site-reviews h2,.stat strong,.simple-modal h2{font-family:var(--font-display);font-weight:500;letter-spacing:0}
+    .hero-copy h1{font-size:76px;line-height:1.02}.site-section-head h2,.site-story h2{font-size:43px;line-height:1.12}.site-reviews h2{font-size:38px;line-height:1.15}.auth-visual h1{font-family:var(--font-display);font-size:56px;line-height:1.08}
+    .site-links a,.site-staff{font-size:13px;font-weight:600}.site-booking label{font-size:10px;font-weight:650}.site-booking input,.site-booking select{font-size:13px}.site-room h3{font-size:22px}.site-room p{font-size:12px;line-height:1.65}.site-room-price{font-size:14px}.site-room-price small{font-size:11px}.site-service strong{font-size:17px}.site-service small{font-size:11px}.site-strip{font-size:11px}.site-contact p{font-size:12px}.site-footer{font-size:11px}
+    .nav-list button{font-size:13px}.nav-label,.eyebrow{font-size:11px}.page-head p,.room-meta,.booking-row small,.service-row small{font-size:12px}.stat small,.stat span{font-size:11px}.stat strong{font-size:26px}.table-wrap table{font-size:12px}.chat-message{font-size:12px;line-height:1.6}.chat-head small{font-size:10px}.suggestions button{font-size:10px}.field,.field input,.field select,.toolbar input,.toolbar select{font-size:13px}.badge{font-size:11px}
+    @media(max-width:850px){.hero-copy h1{font-size:62px}.site-section-head h2,.site-story h2{font-size:37px}}
+    @media(max-width:560px){.hero-copy h1{font-size:49px}.hero-copy p{font-size:13px}.site-section-head h2,.site-story h2{font-size:32px}.site-reviews h2{font-size:30px}.site-links a,.site-staff{font-size:11px}.site-strip{font-size:9px}.site-booking label{font-size:9px}}
+  </style>
+  <style>
+    .site-live-clock,.app-live-clock{font-size:11px;color:#6f8279;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .site-review-section{padding:72px clamp(20px,8vw,112px);background:#e9eee8;scroll-margin-top:78px}
+    .site-review-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}
+    .site-review-heading h2{font:500 40px/1.12 var(--font-display);margin:8px 0}
+    .site-review-summary{display:flex;align-items:center;gap:10px;color:#697b71;font-size:12px;white-space:nowrap}
+    .site-review-summary strong{font:500 30px var(--font-display);color:#193a35}
+    .site-review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .site-review-card{background:#fff;border:1px solid #e0e6de;border-radius:6px;padding:18px;min-height:155px;display:flex;flex-direction:column}
+    .site-review-card p{font:italic 15px/1.65 var(--font-display);color:#34574d;margin:11px 0 16px;flex:1}
+    .site-review-card strong{font-size:12px;color:#193a35}.site-review-card small{font-size:10px;color:#8b9a90;margin-top:3px}
+    .site-hotline,.auth-hotline{display:inline-flex;align-items:center;gap:8px;color:#dfc783;text-decoration:none;font-size:12px;font-weight:650}
+    .auth-hotline{color:var(--teal);margin-top:17px;font-size:13px}
+    .app-live-clock{padding-right:12px;border-right:1px solid var(--line)}
+    @media(max-width:850px){.site-review-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.site-review-heading{align-items:flex-start;flex-direction:column}.site-live-clock{font-size:10px}}
+    @media(max-width:560px){.site-review-section{padding:52px 16px}.site-review-heading h2{font-size:31px}.site-review-grid{grid-template-columns:1fr}.site-live-clock{display:none}.app-live-clock{display:none}}
+    .site-review-grid{grid-template-columns:1fr;gap:0}.site-review-grid.is-collapsed .site-review-card:nth-child(n+4){display:none}.site-review-card{display:grid;grid-template-columns:90px minmax(0,1fr) minmax(120px,auto);align-items:center;gap:16px;background:transparent;border:0;border-bottom:1px solid #dfe6df;border-radius:0;padding:15px 2px;min-height:0}.site-review-card p{font:italic 14px/1.55 var(--font-display);margin:0;min-width:0}.site-review-card .rating{white-space:nowrap}.site-review-author strong,.site-review-author small{display:block}.site-review-toggle{margin-top:16px;border:1px solid #cad9cf;border-radius:4px;padding:10px 14px;color:#28594a;font-weight:650;font-size:12px;background:#fff}.site-review-toggle:hover{background:#edf4ef}.site-review-toggle:focus-visible{outline:3px solid #98d1c2;outline-offset:2px}@media(max-width:600px){.site-review-card{grid-template-columns:1fr auto;gap:6px 12px;padding:13px 0}.site-review-card .rating{grid-column:1}.site-review-card p{grid-column:1/-1;grid-row:2}.site-review-author{grid-column:2;grid-row:1/2;text-align:right}.site-review-card small{font-size:10px}}
+  </style>
+  <style>
+    .room-art{position:relative;overflow:hidden}.room-art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.room-art.has-image:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#102b2680,transparent 75%);pointer-events:none}.room-art.has-image>span{position:relative;z-index:1;color:#fff}.room-art.has-image .badge{color:#28594a;background:#fff}.room-art .badge{margin-left:auto}
+    .service-row{overflow:hidden}.service-photo{width:66px;height:66px;flex:0 0 66px;border-radius:6px;object-fit:cover;background:#edf1eb}.staff-person{display:flex;align-items:center;gap:10px}.staff-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#e1efe9;display:grid;place-items:center;color:var(--teal);font-weight:700;overflow:hidden}.staff-avatar img{width:100%;height:100%;object-fit:cover}
+    .media-control{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px dashed #bdcec4;background:#f7faf7;border-radius:7px;padding:10px}.media-control label{display:flex;align-items:center;gap:9px;font-size:12px;color:#44695a;font-weight:650;cursor:pointer}.media-control input[type=file]{max-width:100%;font-size:11px}.media-preview{grid-column:1/-1;width:100%;max-height:190px;aspect-ratio:16/7;object-fit:cover;border-radius:5px;background:#e9eee9}.media-preview.avatar-preview{width:88px;height:88px;aspect-ratio:1;border-radius:50%}.media-clear{font-size:11px;color:#a34d43;padding:7px}.media-help{grid-column:1/-1;color:#829189;font-size:10px}.user-avatar-image{width:100%;height:100%;object-fit:cover;border-radius:inherit}.review-reply{margin-top:12px;padding:12px;border-left:3px solid #16766b;background:#edf5f0;border-radius:3px;font-size:12px;line-height:1.6}.review-reply strong{display:block;font-size:10px;color:#477364;margin-bottom:4px}.review-reply-form{display:grid;gap:8px;margin-top:12px}.review-reply-form textarea{min-height:70px;border:1px solid var(--line);border-radius:6px;padding:9px;resize:vertical;font-size:12px}.permission-check{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:11px;color:#45685a}.permission-check input{accent-color:var(--teal);width:16px;height:16px}
+    @media(max-width:760px){.service-photo{width:54px;height:54px;flex-basis:54px}.media-control{grid-template-columns:1fr}.media-preview{max-height:150px}}
+  </style>
+  <style>
+    :root{--font-body:"Segoe UI",Tahoma,Arial,sans-serif;--font-display:Georgia,"Times New Roman",serif;font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-kerning:normal}
+    body,button,input,select,textarea{font-family:var(--font-body);letter-spacing:0}
+    h1,h2,h3,.room-art>span:first-of-type,.stat strong,.simple-modal h2{font-family:var(--font-display);font-weight:500;letter-spacing:0}
+    .app-shell{background:#f1f3ee}.sidebar{background:#fcfcf9;border-right-color:#e4e8e0}.brand{font-size:16px}.brand small{font-size:9px}.nav-label{font-size:11px;letter-spacing:1px}.nav-list button{font-size:14px;padding:12px 13px}.nav-list button.active{background:#e3eee8;color:#175f50;box-shadow:inset 3px 0 #b28a45}.main-area{background:#f3f5f1}.topbar{height:72px;background:#fffefa;padding:0 34px}.topbar-title,.user-chip{font-size:13px}.page-wrap{max-width:1560px;padding:34px 38px}.page-head{margin-bottom:25px}.page-head h1{font-size:34px;line-height:1.18;margin:7px 0}.page-head p{font-size:14px;line-height:1.6}.panel,.stat,.room-card,.service-row,.booking-row{border-color:#e1e7df;border-radius:8px;box-shadow:0 3px 12px #263f3310}.panel{padding:22px}.panel h2{font-size:22px}.stats{gap:16px;margin-bottom:22px}.stat{padding:20px;background:linear-gradient(150deg,#fffefa,#fff)}.stat small,.stat span{font-size:12px}.stat strong{font-size:29px;margin:12px 0 7px}.room-grid{gap:18px}.room-art{height:150px}.room-art>span:first-of-type{font-size:23px}.room-body{padding:17px}.room-body h3{font-size:18px}.room-meta{font-size:13px;line-height:1.75}.room-price{font-size:14px}.badge{font-size:11px;padding:6px 10px}.room-actions .primary,.room-actions .secondary,.room-actions select{font-size:12px}.service-row{padding:16px}.service-row strong{font-size:14px}.service-row small{font-size:12px}.booking-row{padding:17px}.booking-row strong{font-size:13px}.booking-row small{font-size:12px;line-height:1.6}.field,.field input,.field select,.toolbar input,.toolbar select{font-size:14px}.table-wrap table{font-size:13px}.table-wrap th{font-size:11px}.permission-check{font-size:12px}
+    .dashboard-welcome{min-height:230px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr);overflow:hidden;margin-bottom:22px;background:#173d36;color:#fff;border-radius:9px;box-shadow:0 12px 28px #183d3620}.dashboard-welcome-copy{padding:30px 34px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}.dashboard-welcome .eyebrow{color:#e3c37d}.dashboard-welcome h1{font-size:32px;line-height:1.15;margin:10px 0}.dashboard-welcome p{max-width:520px;color:#d1ded7;font-size:13px;line-height:1.65;margin:0 0 17px}.dashboard-welcome-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.dashboard-welcome .primary{background:#d2ad66;color:#193a35;border-radius:5px}.dashboard-welcome-photo{position:relative;min-height:230px;background:#36584d}.dashboard-welcome-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.dashboard-welcome-photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#173d3690,transparent 65%)}.dashboard-welcome-count{position:absolute;z-index:1;right:18px;bottom:18px;padding:12px 15px;border:1px solid #ffffff70;background:#173d36cc;color:#fff;border-radius:6px}.dashboard-welcome-count strong{font:500 24px var(--font-display);display:block}.dashboard-welcome-count small{font-size:10px;color:#e1e7df}
+    .staff-permission-list{display:flex;flex-wrap:wrap;gap:8px 14px;min-width:280px}.staff-permission-list .permission-check{white-space:nowrap}.staff-table .staff-person strong{font-size:13px}.staff-table td{vertical-align:middle}.staff-table .secondary{padding:8px 11px}.site-room img,.service-photo,.media-preview{background:#e8ece5}
+    .sidebar{background:#173b35;color:#eaf0e9;border:0;box-shadow:5px 0 22px #14362c12}.sidebar .brand{color:#fff}.sidebar .brand small{color:#a4b8ae}.sidebar .brand-mark{background:#f1eadb;color:#a27c39}.sidebar .nav-label{color:#9bb0a5}.sidebar .nav-list button{color:#d1ddd6}.sidebar .nav-list button:hover,.sidebar .nav-list button.active{background:#28564b;color:#fff;box-shadow:inset 3px 0 #d6b36e}.sidebar .side-bottom{border-top-color:#355a50;color:#fff}.sidebar .side-bottom .muted{color:#a9bdb4}.sidebar .side-bottom .text-button{color:#e5c67f}.sidebar .avatar{background:#dce8dd;color:#1d594b}.sidebar .nav-label{font-size:10px;letter-spacing:1.25px}
+    .main-area{background:#f2f4f0}.topbar{background:#fffefa;border-bottom-color:#e2e7df}.dashboard-welcome{border:1px solid #d9e1d7;background:#173b35}.dashboard-welcome .eyebrow{font-size:10px;letter-spacing:1.4px}.dashboard-welcome h1{font-size:35px;line-height:1.16}.dashboard-welcome-photo:after{background:linear-gradient(90deg,#173b3599 0%,transparent 80%)}.dashboard-welcome-count{border-color:#d5c08a;background:#173b35e8}.dashboard-welcome .primary{background:#d6b36e;color:#173b35}.dashboard-welcome .primary:hover{background:#e2c680}.dashboard-welcome .secondary{background:#fff;color:#173b35;border:1px solid #fff}.dashboard-welcome .secondary:hover{background:#f1eadb;color:#173b35}.panel h2{color:#203e35}.stat{border-top:2px solid #d6b36e}.page-head h1{color:#203e35}.nav-list button{font-size:13px}
+    @media(max-width:760px){.sidebar{box-shadow:12px 0 32px #14362c35}.dashboard-welcome h1{font-size:29px}}
+    @media(max-width:1050px){.page-wrap{padding:28px 24px}.dashboard-welcome{grid-template-columns:1fr .8fr}.staff-permission-list{min-width:220px}}
+    .dashboard-welcome{min-height:245px;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);background:#183d36;border:1px solid #d1d9cf}.dashboard-welcome-copy{padding:32px 36px}.dashboard-welcome h1{font:500 34px/1.15 var(--font-display)}.dashboard-welcome p{font-size:14px}.dashboard-welcome-photo{min-height:245px}.dashboard-welcome-photo img{filter:saturate(.82)}
+    .permission-panel{margin-top:14px;padding:12px 14px;border:1px solid #e0e8e0;border-radius:6px;background:#f9fbf8}.permission-panel strong{display:block;color:#46685b;font-size:11px;margin-bottom:9px}.permission-grid{display:flex;flex-wrap:wrap;gap:8px 14px}.permission-check{display:flex;align-items:center;gap:6px;font-size:11px;color:#45685a}.permission-check input{accent-color:#176b5d;width:15px;height:15px}
+    .site-links a,.site-staff,.nav-list button,.user-chip,.topbar-title{font-family:var(--font-body);font-size:13px;letter-spacing:0}.stat small,.stat span,.room-meta,.booking-row small,.service-row small,.field,.field input,.field select,.toolbar input,.toolbar select,.chat-message,.table-wrap table{font-size:13px;letter-spacing:0}.stat small,.stat span,.nav-label,.badge,.eyebrow,.table-wrap th{letter-spacing:.25px}.primary,.secondary,.danger,.site-booking button,.site-staff{font-size:13px;letter-spacing:0}
+    @media(max-width:1050px){.dashboard-welcome{grid-template-columns:1fr .8fr}.dashboard-welcome-copy{padding:26px}.permission-grid{gap:7px 10px}}
+    @media(max-width:760px){.topbar{height:62px;padding:0 15px}.page-wrap{padding:23px 16px 76px}.page-head h1{font-size:29px}.dashboard-welcome{grid-template-columns:1fr}.dashboard-welcome-copy{padding:24px}.dashboard-welcome-photo{min-height:160px}.dashboard-welcome h1{font-size:29px}.stats{gap:10px}.stat{padding:14px}.stat strong{font-size:23px}.room-art{height:170px}.staff-permission-list,.permission-grid{min-width:0}.permission-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+  <style>
+    :root{--font-body:"Segoe UI",Tahoma,Arial,sans-serif;font-family:var(--font-body);font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-kerning:normal}
+    .app-shell,.app-shell *{font-family:var(--font-body);letter-spacing:0}.app-shell h1,.app-shell h2,.app-shell h3,.app-shell .stat strong,.app-shell .room-art>span:first-of-type{font-family:var(--font-body);font-weight:650;letter-spacing:0}.app-shell h1{font-size:30px;line-height:1.32}.app-shell h2{font-size:18px;line-height:1.4}.app-shell h3{font-size:15px;line-height:1.4}.app-shell p,.app-shell td,.app-shell th,.app-shell label,.app-shell small,.app-shell span,.app-shell button,.app-shell input,.app-shell select,.app-shell textarea{letter-spacing:0}
+    .invoice-paper{max-width:680px;margin:auto;background:#fff;padding:28px;border:1px solid #e1e7df;border-radius:7px}.invoice-brand{display:flex;justify-content:space-between;gap:18px;padding-bottom:17px;border-bottom:1px solid var(--line)}.invoice-brand h3{margin:0}.invoice-lines{margin:17px 0;border-top:1px solid var(--line)}.invoice-line{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid #edf1ed;font-size:13px}.invoice-total{display:flex;justify-content:space-between;font-weight:700;font-size:17px;padding:15px 0}.invoice-note{font-size:11px;color:var(--muted);line-height:1.6}.invoice-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.invoice-card{padding:17px;border:1px solid var(--line);border-radius:7px;background:#fff}.service-order-button{margin-top:9px}.service-order-status{font-size:11px;color:#688078}.invoice-recipient{font-size:11px;color:#6d8076}
+    @media print{body *{visibility:hidden!important}.invoice-paper,.invoice-paper *{visibility:visible!important}.invoice-paper{position:absolute;inset:0;margin:0;border:0;box-shadow:none;max-width:none}.invoice-actions{display:none!important}}
+  </style>
+  <style>
+    :root{--font-body:Arial,"Segoe UI",sans-serif;--font-display:"Times New Roman",Georgia,serif;font-family:var(--font-body);font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-kerning:normal}
+    body,button,input,select,textarea{font-family:var(--font-body)}
+    h1,h2,h3,.hero-copy h1,.site-section-head h2,.site-story h2,.site-reviews h2,.stat strong,.simple-modal h2,.auth-visual h1,.room-art>span:first-of-type{font-family:var(--font-display)!important}
+    .hero-copy h1{font-family:var(--font-display)}
+    .check-row{display:flex;align-items:flex-start;gap:8px;line-height:1.35}
+    .check-row input[type="checkbox"]{width:15px;height:15px;flex:0 0 15px;margin:2px 0 0}
+    .guest-welcome{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;align-items:center;margin-bottom:22px;padding:30px 34px;border-radius:8px;background:#183d36;color:#fff;overflow:hidden}
+    .guest-welcome .eyebrow{color:#e3c37d}.guest-welcome h1{margin:9px 0 10px;font-size:34px;line-height:1.15}.guest-welcome p{max-width:570px;margin:0;color:#d5e3dc;font-size:14px;line-height:1.65}.guest-welcome-photo{min-height:170px;border-radius:6px;background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=700&q=80') center/cover}.guest-welcome-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.guest-welcome-actions .secondary{background:#fff;color:#183d36;border-color:#fff}.guest-section{margin-top:22px}.guest-section-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:12px}.guest-section-head h2{margin:0;color:#203e35;font-size:24px}.guest-section-head p{margin:0;color:#728783;font-size:12px}.guest-room-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.guest-service-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.guest-service-list .service-row{padding:16px;min-height:86px}
+    @media(max-width:900px){.guest-welcome{grid-template-columns:1fr}.guest-welcome-photo{min-height:130px}.guest-room-grid,.guest-service-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:560px){.guest-welcome{padding:23px 20px}.guest-welcome h1{font-size:28px}.guest-room-grid,.guest-service-list{grid-template-columns:1fr}.guest-section-head{align-items:flex-start;flex-direction:column;gap:5px}}
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="modal-root"></div>
+  <div id="toast-root" aria-live="polite"></div>
+  <script>
+    'use strict';
+    const STORE_KEY = 'lumiere-hotel-demo-v2';
+    const SESSION_KEY = 'lumiere-session';
+    const HOTEL_HOTLINE = '1900 0000';
+    const HOTEL_HOTLINE_IS_PLACEHOLDER = true;
+    const money = value => new Intl.NumberFormat('vi-VN').format(Number(value) || 0) + 'đ';
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const isoDate = offset => { const date = new Date(); date.setDate(date.getDate() + offset); return date.toISOString().slice(0,10); };
+    const seed = {
+      rooms:[
+        {id:'L-203',type:'Deluxe Garden',floor:'Tầng 2',price:1850000,status:'occupied',capacity:2,beds:'Giường đôi',features:'Ban công, bồn tắm'},
+        {id:'L-305',type:'Premium River View',floor:'Tầng 3',price:2450000,status:'available',capacity:2,beds:'Giường đôi',features:'View sông, bữa sáng'},
+        {id:'L-401',type:'Family Suite',floor:'Tầng 4',price:3200000,status:'cleaning',capacity:4,beds:'2 giường đôi',features:'2 phòng ngủ, bếp nhỏ'},
+        {id:'L-108',type:'Classic Courtyard',floor:'Tầng 1',price:1250000,status:'maintenance',capacity:2,beds:'Giường đơn',features:'Sân trong, bàn làm việc'},
+        {id:'L-212',type:'Deluxe Garden',floor:'Tầng 2',price:1850000,status:'available',capacity:2,beds:'Giường đôi',features:'Ban công, bồn tắm'},
+        {id:'L-502',type:'Lumière Suite',floor:'Tầng 5',price:4800000,status:'occupied',capacity:4,beds:'Giường đôi',features:'View thành phố, minibar'},
+        {id:'L-114',type:'Classic Twin',floor:'Tầng 1',price:1450000,status:'available',capacity:2,beds:'2 giường đơn',features:'Sân trong, bàn làm việc'},
+        {id:'L-218',type:'Riverside Twin',floor:'Tầng 2',price:2150000,status:'available',capacity:2,beds:'2 giường đơn',features:'View sông, bữa sáng'},
+        {id:'L-306',type:'Family Garden',floor:'Tầng 3',price:2850000,status:'available',capacity:4,beds:'2 giường đôi',features:'Ban công, khu vui chơi'},
+        {id:'L-604',type:'Panorama Suite',floor:'Tầng 6',price:5600000,status:'available',capacity:4,beds:'Giường đôi',features:'View toàn cảnh, phòng khách'},
+        {id:'L-207',type:'Classic Garden',floor:'Tầng 2',price:1650000,status:'available',capacity:2,beds:'Giường đôi',features:'Nhìn ra sân vườn, bàn làm việc'},
+        {id:'L-308',type:'Premium Balcony',floor:'Tầng 3',price:2700000,status:'available',capacity:2,beds:'Giường đôi',features:'Ban công riêng, bồn tắm'},
+        {id:'L-405',type:'Family Residence',floor:'Tầng 4',price:3650000,status:'available',capacity:4,beds:'2 giường đôi',features:'Phòng khách, khu vực ăn uống'},
+        {id:'L-705',type:'Lumière Penthouse',floor:'Tầng 7',price:6200000,status:'available',capacity:4,beds:'Giường đôi',features:'Sân hiên riêng, view thành phố'}
+      ],
+      services:[
+        {name:'Bữa sáng buffet',category:'Ẩm thực',price:280000,unit:'/ người',icon:'☕'},
+        {name:'Đón sân bay',category:'Di chuyển',price:450000,unit:'/ chuyến',icon:'↗'},
+        {name:'Massage thư giãn',category:'Wellness',price:650000,unit:'/ 60 phút',icon:'✦'},
+        {name:'Giặt ủi nhanh',category:'Tiện ích',price:180000,unit:'/ túi',icon:'⌁'},
+        {name:'Hoạt động thể thao',category:'Trải nghiệm',price:350000,unit:'/ người',icon:'⌖'},
+        {name:'Tham quan du lịch',category:'Khám phá',price:850000,unit:'/ tour',icon:'⌂'},
+        {name:'Nghe hát',category:'Giải trí',price:450000,unit:'/ buổi',icon:'♫'},
+        {name:'Trà chiều bên sông',category:'Ẩm thực',price:320000,unit:'/ người',icon:'♨'},
+        {name:'Thuê xe đạp',category:'Di chuyển',price:180000,unit:'/ ngày',icon:'↗'},
+        {name:'Lớp yoga thư giãn',category:'Wellness',price:420000,unit:'/ người',icon:'✦'},
+        {name:'Trang trí phòng dịp đặc biệt',category:'Trải nghiệm',price:1200000,unit:'/ phòng',icon:'❋'}
+      ],
+      users:[
+        {email:'admin@lumiere.vn',password:'admin123',name:'Lê Thu Thùy',role:'admin',active:true,phone:''},
+        {email:'guest@lumiere.vn',password:'guest123',name:'Nguyễn Minh Anh',role:'guest',active:true,phone:'090 123 4567'},
+        {email:'nhanvien@lumiere.vn',password:'Abc12345',name:'Nguyễn Trần Tuấn Anh',role:'staff',active:true,phone:'091 234 5678'}
+      ],
+      bookings:[
+        {id:'BK-24081',room:'L-203',type:'Deluxe Garden',guest:'Nguyễn Minh Anh',email:'guest@lumiere.vn',checkIn:'2026-09-22',checkOut:'2026-09-24',guests:2,amount:3700000,status:'Đang ở',services:[],paid:false},
+        {id:'BK-24080',room:'L-502',type:'Lumière Suite',guest:'Trần Hoàng Long',email:'long@example.vn',checkIn:'2026-09-18',checkOut:'2026-09-22',guests:2,amount:19200000,status:'Đã xác nhận',services:[],paid:true},
+        {id:'BK-24079',room:'L-305',type:'Premium River View',guest:'Lê Thu Hà',email:'ha@example.vn',checkIn:'2026-09-14',checkOut:'2026-09-16',guests:2,amount:4900000,status:'Đã trả phòng',services:[],paid:true}
+      ],
+      requests:[
+        {id:'YC-1042',bookingId:'BK-24081',guest:'Nguyễn Minh Anh',room:'L-203',title:'Dọn phòng sau khi trả phòng',detail:'Kiểm tra minibar và vệ sinh phòng.',status:'Chờ tiếp nhận'},
+        {id:'YC-1041',bookingId:'BK-24080',guest:'Trần Hoàng Long',room:'L-502',title:'Bữa sáng buffet',detail:'Chuẩn bị bữa sáng cho 2 khách.',status:'Đã tiếp nhận'}
+      ],
+      reviews:[
+        {guest:'Lê Thu Hà',rating:5,comment:'Không gian rất đẹp, nhân viên chu đáo và bữa sáng ngon.'},
+        {guest:'Phạm Gia Hân',rating:4,comment:'Phòng sạch, view đẹp, quy trình nhận phòng nhanh.'},
+        {guest:'Trần Minh Khang',rating:5,comment:'Nhân viên hỗ trợ nhiệt tình, phòng yên tĩnh và thoải mái.'},
+        {guest:'Hoàng Mai Chi',rating:4,comment:'Bữa sáng đa dạng, không gian sân vườn đẹp và nhiều góc thư giãn.'},
+        {guest:'Đặng Hoàng Nam',rating:5,comment:'View sông tuyệt vời, nhận phòng nhanh và tư vấn dịch vụ rõ ràng.'},
+        {guest:'Nguyễn Khánh Linh',rating:5,comment:'Phòng rộng, giường êm, đội ngũ hỗ trợ rất chu đáo.'},
+        {guest:'Phan Đức Anh',rating:5,comment:'Gia đình có kỳ nghỉ đáng nhớ, các bạn nhỏ thích khu vui chơi.'},
+        {guest:'Lý Thảo My',rating:4,comment:'Massage thư giãn tốt, không gian riêng tư và dễ chịu.'},
+        {guest:'Bùi Quang Huy',rating:5,comment:'Tour tham quan được sắp xếp chu đáo, hướng dẫn viên thân thiện.'},
+        {guest:'Võ Ngọc Anh',rating:4,comment:'Phòng sạch, yên tĩnh; dịch vụ giặt ủi nhanh và tiện lợi.'},
+        {guest:'Hoàng Anh Khoa',rating:5,comment:'Thủ tục nhận phòng nhanh, phòng có ánh sáng đẹp và đầy đủ tiện nghi.'}
+      ],
+      session:null,
+      serviceOrders:[],
+      invoiceNotifications:[],
+      readNotifications:false
+    };
+    let data;
+    try { data = {...seed,...JSON.parse(localStorage.getItem(STORE_KEY) || '{}')}; } catch { data = {...seed}; }
+    for (const key of ['rooms','services','users','bookings','requests','reviews','serviceOrders','invoiceNotifications']) {
+      if (!Array.isArray(data[key])) data[key] = [...seed[key]];
+      else {
+        const identity = key === 'rooms' ? item => item.id : key === 'services' ? item => item.name : key === 'reviews' ? item => `${item.guest}|${item.comment}` : item => item.email || item.id;
+        const existing = new Set(data[key].map(identity));
+        data[key].push(...seed[key].filter(item => !existing.has(identity(item))));
+      }
+    }
+    try { data.session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch { data.session = null; }
+    let page = 'dashboard';
+    let selectedRole = 'guest';
+    let authMode = 'login';
+    let roomSearch = '';
+    let selectedRoomId = '';
+    let chatOpen = false;
+    let chatMessages = [];
+    let toastTimer;
+    const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify({...data,session:null})); if(data.session) localStorage.setItem(SESSION_KEY,JSON.stringify(data.session)); else localStorage.removeItem(SESSION_KEY); } catch {} };
+    const roleName = role => ({admin:'Quản trị viên',staff:'Nhân viên',guest:'Khách hàng'}[role] || 'Khách hàng');
+    const roomStatus = status => ({available:'Sẵn sàng',occupied:'Đang ở',cleaning:'Đang dọn',maintenance:'Bảo trì'}[status] || status);
+    const statusClass = status => status==='available'||status==='Đã xác nhận'?'':status==='occupied'||status==='Đang ở'?'warn':status==='maintenance'||status==='Đã hủy'?'bad':'gray';
+    const isAdmin = () => data.session?.role === 'admin';
+    const notify = message => { const root=document.getElementById('toast-root'); root.innerHTML=`<div class="toast">${escapeHtml(message)}</div>`; clearTimeout(toastTimer); toastTimer=setTimeout(()=>root.innerHTML='',3000); };
+    const pageTitle = {dashboard:'Tổng quan',rooms:'Phòng',bookings:'Đặt phòng',services:'Dịch vụ',operations:'Vận hành',invoices:'Hóa đơn',reports:'Báo cáo doanh thu',staff:'Nhân viên',reviews:'Đánh giá',settings:'Cài đặt'};
+    function navItems(){const role=data.session?.role;const base=role==='guest'?[['dashboard','⌂','Chào mừng'],['rooms','▤','Phòng còn trống'],['services','✦','Dịch vụ']]:[['dashboard','◫','Tổng quan'],['rooms','▤','Phòng'],['bookings','▧','Đặt phòng'],['services','✦','Dịch vụ'],['reviews','☆','Đánh giá']];if(role==='admin')base.push(['operations','⌁','Vận hành'],['reports','↗','Doanh thu'],['staff','♙','Nhân viên']);if(role==='staff')base.push(['operations','⌁','Vận hành']);if(role!=='guest')base.push(['settings','⚙','Cài đặt']);return base;}
+    function render(){if(!data.session){renderAuth();return;}const app=document.getElementById('app');const nav=navItems();if(!nav.some(item=>item[0]===page))page='dashboard';app.innerHTML=`<div class="app-shell"><aside class="sidebar" id="sidebar"><div class="brand"><span class="brand-mark">L</span><span>LUMIÈRE<small>HOTEL MANAGEMENT</small></span></div><span class="nav-label">Không gian làm việc</span><nav class="nav-list">${nav.map(([id,icon,label])=>`<button data-page="${id}" class="${page===id?'active':''}"><span class="nav-symbol">${icon}</span>${label}</button>`).join('')}</nav><div class="side-bottom"><div class="row"><span class="avatar">${escapeHtml(data.session.name.slice(0,1))}</span><span><strong>${escapeHtml(data.session.name)}</strong><br><span class="muted">${roleName(data.session.role)}</span></span></div><button class="text-button" data-action="logout" style="margin-top:13px">Đăng xuất</button></div></aside><main class="main-area"><header class="topbar"><div class="row"><button class="icon-button mobile-menu" data-action="menu" aria-label="Mở menu">☰</button><span class="topbar-title">Lumière Hotel &nbsp; / &nbsp; ${pageTitle[page]}</span></div><div class="top-actions"><button class="icon-button" data-action="notifications" aria-label="Thông báo">♧</button><span class="user-chip"><span class="avatar">${escapeHtml(data.session.name.slice(0,1))}</span><span>${escapeHtml(data.session.name)}</span></span></div></header><section class="page-wrap">${renderPage()}</section></main></div>${renderChat()}`;}
+    function pageHead(title,description,action=''){return `<div class="page-head"><div><span class="eyebrow">Lumière Hotel</span><h1>${title}</h1><p>${description}</p></div>${action}</div>`;}
+    function renderDashboard(){const total=data.rooms.length,available=data.rooms.filter(room=>room.status==='available').length,occupied=data.rooms.filter(room=>room.status==='occupied').length;const visibleBookings=isAdmin()?data.bookings:data.bookings.filter(booking=>booking.email===data.session.email);const income=data.bookings.reduce((sum,b)=>sum+(Number(b.amount)||0),0);const active=visibleBookings.filter(b=>!['Đã hủy','Đã trả phòng'].includes(b.status)).length;return `${pageHead(data.session.role==='admin'?'Bảng điều khiển':'Chào mừng trở lại',`Xin chào ${escapeHtml(data.session.name)}. Đây là tình hình lưu trú hiện tại.`)}<div class="stats"><article class="stat"><small>Phòng sẵn sàng</small><strong>${available}</strong><span>trên ${total} phòng</span></article><article class="stat"><small>Đang có khách</small><strong>${occupied}</strong><span>${total?Math.round(occupied/total*100):0}% công suất</span></article><article class="stat"><small>${isAdmin()?'Đặt phòng':'Lịch đặt của bạn'}</small><strong>${active}</strong><span>đang hoạt động</span></article><article class="stat"><small>${isAdmin()?'Doanh thu đặt phòng':'Dịch vụ khách sạn'}</small><strong>${isAdmin()?money(income):data.services.length}</strong><span>${isAdmin()?'tổng theo dữ liệu mẫu':'dịch vụ sẵn có'}</span></article></div><div class="grid-2"><section class="panel"><div class="panel-head"><h2>${isAdmin()?'Đặt phòng gần đây':'Kỳ lưu trú của bạn'}</h2><button class="text-button" data-page="bookings">Xem tất cả</button></div>${visibleBookings.length?visibleBookings.slice(0,4).map(booking=>bookingCard(booking,false)).join(''):'<div class="empty">Chưa có lịch đặt phòng.</div>'}</section><section class="panel"><div class="panel-head"><h2>Tình trạng phòng</h2><button class="text-button" data-page="rooms">Quản lý phòng</button></div><div class="metric-list"><div class="metric-line"><span>Sẵn sàng</span><strong>${available}</strong></div><div class="metric-line"><span>Đang ở</span><strong>${occupied}</strong></div><div class="metric-line"><span>Đang dọn</span><strong>${data.rooms.filter(r=>r.status==='cleaning').length}</strong></div><div class="metric-line"><span>Bảo trì</span><strong>${data.rooms.filter(r=>r.status==='maintenance').length}</strong></div></div><div class="notice" style="margin-top:14px">Dữ liệu được lưu trên trình duyệt này để phục vụ trình diễn.</div></section></div>`;}
+    function roomCard(room){const available=room.status==='available';return `<article class="room-card"><div class="room-art"><span>${escapeHtml(room.type)}</span><span class="badge ${statusClass(room.status)}">${roomStatus(room.status)}</span></div><div class="room-body"><h3>${escapeHtml(room.id)} <span class="muted">· ${escapeHtml(room.floor)}</span></h3><div class="room-meta">${escapeHtml(room.beds)} · tối đa ${room.capacity} khách<br>${escapeHtml(room.features||'')}</div><div class="room-price">${money(room.price)} <span class="muted" style="font-size:10px;font-weight:400">/ đêm</span></div><div class="room-actions">${data.session.role==='guest'?(available?`<button class="primary" data-action="book" data-room="${escapeHtml(room.id)}">Đặt phòng</button>`:'<button class="secondary" disabled>Chưa sẵn sàng</button>'):isAdmin()?`<select aria-label="Trạng thái phòng" data-room-status="${escapeHtml(room.id)}">${Object.entries({available:'Sẵn sàng',occupied:'Đang ở',cleaning:'Đang dọn',maintenance:'Bảo trì'}).map(([key,label])=>`<option value="${key}" ${room.status===key?'selected':''}>${label}</option>`).join('')}</select><button class="secondary" data-action="edit-room" data-room="${escapeHtml(room.id)}">Sửa</button>`:''}</div></div></article>`;}
+    function renderRooms(){const query=roomSearch.toLocaleLowerCase('vi');const rooms=data.rooms.filter(room=>`${room.id} ${room.type} ${room.floor}`.toLocaleLowerCase('vi').includes(query));return `${pageHead('Danh sách phòng','Theo dõi loại phòng, giá và trạng thái.',isAdmin()?'<button class="primary" data-action="add-room">+ Thêm phòng</button>':'')}<div class="toolbar"><input id="room-search" value="${escapeHtml(roomSearch)}" placeholder="Tìm theo mã hoặc loại phòng"><select id="room-filter"><option value="all">Tất cả trạng thái</option>${Object.entries({available:'Sẵn sàng',occupied:'Đang ở',cleaning:'Đang dọn',maintenance:'Bảo trì'}).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div><div class="room-grid" id="room-grid">${rooms.length?rooms.map(roomCard).join(''):'<div class="empty">Không tìm thấy phòng phù hợp.</div>'}</div>`;}
+    function bookingCard(booking,actions=true){const mine=booking.email===data.session.email;const canCancel=mine&&['Chờ xác nhận','Đã xác nhận'].includes(booking.status);return `<article class="booking-row"><span class="avatar">⌂</span><main><strong>${escapeHtml(booking.type)} · ${escapeHtml(booking.room)}</strong><small>${escapeHtml(booking.guest)} · ${escapeHtml(booking.checkIn)} → ${escapeHtml(booking.checkOut)} · ${booking.guests||2} khách</small></main><strong>${money(booking.amount)}</strong><span class="badge ${statusClass(booking.status)}">${escapeHtml(booking.status)}</span>${actions?`<div class="booking-actions">${isAdmin()?`<select data-booking-status="${escapeHtml(booking.id)}"><option ${booking.status==='Chờ xác nhận'?'selected':''}>Chờ xác nhận</option><option ${booking.status==='Đã xác nhận'?'selected':''}>Đã xác nhận</option><option ${booking.status==='Đang ở'?'selected':''}>Đang ở</option><option ${booking.status==='Đã trả phòng'?'selected':''}>Đã trả phòng</option><option ${booking.status==='Đã hủy'?'selected':''}>Đã hủy</option></select>${booking.status==='Đang ở'?`<button class="secondary" data-action="checkout" data-id="${escapeHtml(booking.id)}">Trả phòng</button>`:''}`:''}${canCancel?`<button class="danger" data-action="cancel-booking" data-id="${escapeHtml(booking.id)}">Hủy đặt</button>`:''}${booking.status==='Đã trả phòng'&&mine?`<button class="secondary" data-action="review" data-id="${escapeHtml(booking.id)}">Đánh giá</button>`:''}</div>`:''}</article>`;}
+    function renderBookings(){const bookings=isAdmin()?data.bookings:data.bookings.filter(b=>b.email===data.session.email);return `${pageHead(isAdmin()?'Quản lý đặt phòng':'Lịch đặt phòng','Theo dõi trạng thái và thông tin lưu trú.')}${bookings.length?bookings.map(b=>bookingCard(b)).join(''):'<section class="panel empty">Bạn chưa có đặt phòng nào. <button class="text-button" data-page="rooms">Khám phá phòng</button></section>'}`;}
+    function renderServices(){return `${pageHead('Dịch vụ khách sạn','Bảng giá các tiện ích hiện có.',isAdmin()?'<button class="primary" data-action="add-service">+ Thêm dịch vụ</button>':'')}<div class="service-grid">${data.services.map(service=>`<article class="service-row"><span class="service-icon">${escapeHtml(service.icon||'✦')}</span><main><strong>${escapeHtml(service.name)}</strong><small>${escapeHtml(service.category)} · ${money(service.price)} ${escapeHtml(service.unit)}</small></main>${isAdmin()?`<button class="secondary" data-action="edit-service" data-name="${escapeHtml(service.name)}">Sửa</button><button class="danger" data-action="delete-service" data-name="${escapeHtml(service.name)}">Xóa</button>`:''}</article>`).join('')}</div>`;}
+    function renderOperations(){if(data.session.role==='guest')return '<section class="panel empty">Bạn không có quyền xem khu vực vận hành.</section>';return `${pageHead('Vận hành','Tiếp nhận yêu cầu dịch vụ và theo dõi hóa đơn.') }<section class="panel"><div class="panel-head"><h2>Yêu cầu đang xử lý</h2></div>${data.requests.length?data.requests.map(request=>`<div class="booking-row"><span class="avatar">⌁</span><main><strong>${escapeHtml(request.title)}</strong><small>${escapeHtml(request.id)} · ${escapeHtml(request.bookingId)} · ${escapeHtml(request.guest)} · phòng ${escapeHtml(request.room)}<br>${escapeHtml(request.detail)}</small></main><select data-request-status="${escapeHtml(request.id)}"><option ${request.status==='Chờ tiếp nhận'?'selected':''}>Chờ tiếp nhận</option><option ${request.status==='Đã tiếp nhận'?'selected':''}>Đã tiếp nhận</option><option ${request.status==='Đang xử lý'?'selected':''}>Đang xử lý</option><option ${request.status==='Hoàn tất'?'selected':''}>Hoàn tất</option></select></div>`).join(''):'<div class="empty">Chưa có yêu cầu.</div>'}</section><section class="panel"><div class="panel-head"><h2>Hóa đơn đặt phòng</h2></div><div class="table-wrap"><table><thead><tr><th>Mã đặt phòng</th><th>Khách hàng</th><th>Số tiền</th><th>Thanh toán</th></tr></thead><tbody>${data.bookings.map(b=>`<tr><td>${escapeHtml(b.id)}</td><td>${escapeHtml(b.guest)}</td><td>${money(b.amount)}</td><td><label class="check-row"><input type="checkbox" data-paid="${escapeHtml(b.id)}" ${b.paid?'checked':''}> Đã thanh toán</label></td></tr>`).join('')}</tbody></table></div></section>`;}
+    function renderReports(){if(!isAdmin())return '<section class="panel empty">Bạn không có quyền xem báo cáo doanh thu.</section>';const total=data.bookings.reduce((n,b)=>n+Number(b.amount||0),0),paid=data.bookings.filter(b=>b.paid).reduce((n,b)=>n+Number(b.amount||0),0),unpaid=total-paid;return `${pageHead('Báo cáo doanh thu','Tổng hợp từ dữ liệu đặt phòng mẫu.') }<div class="stats"><article class="stat"><small>Tổng doanh thu</small><strong>${money(total)}</strong><span>${data.bookings.length} đặt phòng</span></article><article class="stat"><small>Đã thanh toán</small><strong>${money(paid)}</strong><span>đã ghi nhận</span></article><article class="stat"><small>Còn phải thu</small><strong>${money(unpaid)}</strong><span>chưa thanh toán</span></article><article class="stat"><small>Giá dịch vụ hiện có</small><strong>${data.services.length}</strong><span>loại dịch vụ</span></article></div><section class="panel"><div class="panel-head"><h2>Chi tiết đặt phòng</h2></div><div class="table-wrap"><table><thead><tr><th>Mã</th><th>Khách hàng</th><th>Phòng</th><th>Trạng thái</th><th>Số tiền</th><th>Thanh toán</th></tr></thead><tbody>${data.bookings.map(b=>`<tr><td>${escapeHtml(b.id)}</td><td>${escapeHtml(b.guest)}</td><td>${escapeHtml(b.room)}</td><td>${escapeHtml(b.status)}</td><td>${money(b.amount)}</td><td>${b.paid?'Đã thanh toán':'Chưa thanh toán'}</td></tr>`).join('')}</tbody></table></div></section>`;}
+    function renderStaff(){if(!isAdmin())return '<section class="panel empty">Bạn không có quyền quản lý nhân viên.</section>';const staff=data.users.filter(user=>user.role==='staff');return `${pageHead('Nhân viên','Quản lý tài khoản nhân viên của bản demo.','<button class="primary" data-action="add-staff">+ Thêm nhân viên</button>')}<section class="panel"><div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Email</th><th>Trạng thái</th><th>Quyền</th></tr></thead><tbody>${staff.map(user=>`<tr><td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.email)}</td><td>${user.active?'Đang hoạt động':'Đã khóa'}</td><td><button class="secondary" data-action="toggle-staff" data-email="${escapeHtml(user.email)}">${user.active?'Khóa':'Mở khóa'}</button></td></tr>`).join('')}</tbody></table></div></section>`;}
+    function renderReviews(){const avg=data.reviews.length?(data.reviews.reduce((n,r)=>n+r.rating,0)/data.reviews.length).toFixed(1):'0.0';return `${pageHead('Đánh giá','Nhận xét từ khách lưu trú.') }<section class="panel"><div class="row"><strong style="font:500 33px Georgia,serif">${avg}</strong><span class="rating">★★★★★</span><span class="muted">${data.reviews.length} đánh giá</span></div></section><div class="service-grid">${data.reviews.map(review=>`<article class="panel"><div class="panel-head"><strong>${escapeHtml(review.guest)}</strong><span class="rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span></div><p style="font-size:12px;line-height:1.7;color:var(--muted)">${escapeHtml(review.comment)}</p></article>`).join('')}</div>`;}
+    function renderSettings(){return `${pageHead('Cài đặt tài khoản','Cập nhật thông tin hiển thị của bạn.') }<section class="panel" style="max-width:640px"><form id="settings-form" class="stack"><label class="field">Họ và tên<input name="name" required value="${escapeHtml(data.session.name)}"></label><label class="field">Email<input value="${escapeHtml(data.session.email)}" disabled></label><label class="field">Số điện thoại<input name="phone" value="${escapeHtml(data.session.phone||'')}"></label><div><button class="primary">Lưu thay đổi</button></div></form></section>`;}
+    function renderPage(){return ({dashboard:renderDashboard,rooms:renderRooms,bookings:renderBookings,services:renderServices,operations:renderOperations,reports:renderReports,staff:renderStaff,reviews:renderReviews,settings:renderSettings}[page]||renderDashboard)();}
+    function renderAuth(){const app=document.getElementById('app');const headings={login:['Đăng nhập','Đăng nhập để tiếp tục đến không gian quản lý.'],register:['Tạo tài khoản','Đăng ký tài khoản khách hàng mới.'],forgot:['Khôi phục mật khẩu','Nhập email để xem hướng dẫn đặt lại mật khẩu demo.']};const [title,description]=headings[authMode];app.innerHTML=`<main class="auth-screen"><section class="auth-visual"><div><div class="brand"><span class="brand-mark">L</span><span>LUMIÈRE<small>HOTEL MANAGEMENT</small></span></div><span class="eyebrow" style="color:#e3c47d">Lưu trú, được chăm chút</span><h1>Một kỳ nghỉ bắt đầu từ sự an tâm.</h1><p>Không gian quản lý khách sạn Lumière Hotel, dành cho khách lưu trú và đội ngũ vận hành.</p></div><small>© Lumière Hotel · Bản demo quản lý lưu trú</small></section><section class="auth-form-side"><div class="auth-box"><span class="eyebrow">Chào mừng đến Lumière</span><h2>${title}</h2><p class="muted" style="font-size:12px;line-height:1.6">${description}</p>${authMode==='login'?`<div class="role-switch">${[['guest','Khách hàng'],['staff','Nhân viên'],['admin','Quản trị']].map(([role,label])=>`<button data-role="${role}" class="${selectedRole===role?'selected':''}">${label}</button>`).join('')}</div>`:''}<form id="auth-form" class="stack">${authMode==='register'?'<label class="field">Họ và tên<input name="name" required autocomplete="name"></label><label class="field">Số điện thoại<input name="phone" autocomplete="tel"></label>':''}<label class="field">Email<input name="email" type="email" required autocomplete="username"></label>${authMode!=='forgot'?'<label class="field">Mật khẩu<input name="password" type="password" required autocomplete="current-password"></label>':''}<button class="primary" style="padding:12px">${authMode==='login'?'Đăng nhập':authMode==='register'?'Tạo tài khoản':'Gửi hướng dẫn'}</button></form><div class="auth-links">${authMode==='login'?'<button class="text-button" data-auth="register">Đăng ký</button><button class="text-button" data-auth="forgot">Quên mật khẩu?</button>':`<button class="text-button" data-auth="login">Quay lại đăng nhập</button>`}</div><p class="muted" style="font-size:10px;margin-top:24px">Bản demo dùng dữ liệu trình diễn lưu trong trình duyệt.</p></div></section></main>`;}
+    function renderChat(){const title=data.session.role==='admin'?'Hỗ trợ báo cáo và vận hành':'Tư vấn phòng, giá và dịch vụ';const welcome=data.session.role==='admin'?'Xin chào. Tôi có thể tra cứu doanh thu, tình trạng phòng, đặt phòng và dịch vụ từ dữ liệu demo.':'Xin chào. Tôi có thể tìm phòng phù hợp, kiểm tra giá, dịch vụ, đánh giá và lịch đặt của bạn.';if(!chatMessages.length)chatMessages=[{from:'ai',text:welcome}];return `<div class="chat-wrap">${chatOpen?`<section class="chat-panel"><header class="chat-head"><div><strong>Lumière AI</strong><small>${title} · Trợ lý quy tắc theo dữ liệu demo</small></div><button data-action="chat-close" aria-label="Đóng chat">×</button></header><div class="chat-log" id="chat-log">${chatMessages.map(message=>`<div class="chat-message ${message.from}">${escapeHtml(message.text)}</div>`).join('')}</div><div class="suggestions">${(isAdmin()?['Báo cáo doanh thu','Phòng nào đang trống?','Đặt phòng chờ xác nhận']:['Gợi ý phòng dưới 3 triệu cho 3 người','Dịch vụ dưới 500 nghìn','Lịch đặt của tôi']).map(text=>`<button data-question="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join('')}</div><form id="chat-form" class="chat-form"><input name="question" placeholder="Nhập câu hỏi..." aria-label="Nhập câu hỏi cho Lumière AI" autocomplete="off"><button aria-label="Gửi câu hỏi">Gửi</button></form></section>`:`<button class="chat-toggle" data-action="chat-open"><span>✦</span>Lumière AI</button>`}</div>`;}
+    function openModal(title,body){document.getElementById('modal-root').innerHTML=`<div class="overlay" data-action="close-modal"><section class="modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(title)}"><div class="panel-head"><h2>${escapeHtml(title)}</h2><button class="icon-button" data-action="close-modal" aria-label="Đóng">×</button></div>${body}</section></div>`;}
+    function closeModal(){document.getElementById('modal-root').innerHTML='';}
+    function bookRoom(roomId){const room=data.rooms.find(item=>item.id===roomId);if(!room||room.status!=='available')return;const services=data.services;openModal('Đặt phòng',`<form id="booking-form"><div class="notice" style="margin-bottom:14px">${escapeHtml(room.type)} · ${money(room.price)} mỗi đêm · tối đa ${room.capacity} khách</div><div class="form-grid"><label class="field">Ngày nhận phòng<input name="checkIn" type="date" required min="${isoDate(0)}" value="${isoDate(1)}"></label><label class="field">Ngày trả phòng<input name="checkOut" type="date" required min="${isoDate(1)}" value="${isoDate(2)}"></label><label class="field">Số khách<input name="guests" type="number" min="1" max="${room.capacity}" value="1" required></label><div class="field wide">Dịch vụ thêm${services.map((service,index)=>`<label class="check-row"><input type="checkbox" name="service" value="${index}"> ${escapeHtml(service.name)} · ${money(service.price)}</label>`).join('')}</div></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Đóng</button><button class="primary">Xác nhận đặt phòng</button></div></form>`);}
+    function showRoomForm(room){const editing=!!room;openModal(editing?'Sửa thông tin phòng':'Thêm phòng',`<form id="room-form"><input type="hidden" name="originalId" value="${escapeHtml(room?.id||'')}"><div class="form-grid"><label class="field">Mã phòng<input name="id" required value="${escapeHtml(room?.id||'')}"></label><label class="field">Loại phòng<input name="type" required value="${escapeHtml(room?.type||'')}"></label><label class="field">Giá mỗi đêm<input name="price" type="number" min="1" required value="${room?.price||''}"></label><label class="field">Sức chứa<input name="capacity" type="number" min="1" required value="${room?.capacity||2}"></label><label class="field">Tầng<input name="floor" value="${escapeHtml(room?.floor||'')}"></label><label class="field">Loại giường<input name="beds" value="${escapeHtml(room?.beds||'Giường đôi')}"></label><label class="field wide">Tiện nghi<input name="features" value="${escapeHtml(room?.features||'')}"></label></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Hủy</button><button class="primary">Lưu phòng</button></div></form>`);}
+    function showServiceForm(service){const editing=!!service;openModal(editing?'Sửa dịch vụ':'Thêm dịch vụ',`<form id="service-form"><input type="hidden" name="originalName" value="${escapeHtml(service?.name||'')}"><div class="stack"><label class="field">Tên dịch vụ<input name="name" required value="${escapeHtml(service?.name||'')}"></label><label class="field">Danh mục<input name="category" required value="${escapeHtml(service?.category||'')}"></label><label class="field">Giá<input name="price" type="number" min="1" required value="${service?.price||''}"></label><label class="field">Đơn vị<input name="unit" value="${escapeHtml(service?.unit||'')}"></label></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Hủy</button><button class="primary">Lưu dịch vụ</button></div></form>`);}
+    function showStaffForm(){openModal('Thêm nhân viên',`<form id="staff-form"><div class="stack"><label class="field">Họ và tên<input name="name" required></label><label class="field">Email<input name="email" type="email" required></label><label class="field">Mật khẩu tạm<input name="password" type="password" minlength="8" required></label></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Hủy</button><button class="primary">Tạo tài khoản</button></div></form>`);}
+    function showReviewForm(bookingId){openModal('Đánh giá kỳ lưu trú',`<form id="review-form"><input type="hidden" name="bookingId" value="${escapeHtml(bookingId)}"><div class="stack"><label class="field">Số sao<select name="rating"><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select></label><label class="field">Nhận xét<textarea name="comment" required maxlength="500"></textarea></label></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Hủy</button><button class="primary">Gửi đánh giá</button></div></form>`);}
+    function login(email,password,role){const user=data.users.find(item=>item.email.toLowerCase()===email.toLowerCase()&&item.password===password&&item.role===role&&item.active);if(!user){notify('Thông tin đăng nhập chưa đúng hoặc tài khoản đã bị khóa.');return false;}data.session={email:user.email,name:user.name,role:user.role,phone:user.phone||''};page='dashboard';chatMessages=[];save();render();return true;}
+    function normalize(text){return String(text).toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9., ]/g,' ').replace(/\s+/g,' ').trim();}
+    function parseBudget(text){let match=text.match(/(?:duoi|toi da|ngan sach|khong qua|tam)/);match=text.match(/(?:duoi|toi da|ngan sach|khong qua|tam)?\s*(\d+(?:[.,]\d+)?)\s*(trieu|tr|nghin|ngan|k|vnd|dong)?/);if(!match)return null;const num=Number(match[1].replace(',','.'));const unit=match[2]||'';if(unit==='trieu'||unit==='tr')return num*1000000;if(unit==='nghin'||unit==='ngan'||unit==='k')return num*1000;if(unit==='vnd'||unit==='dong')return num;return num>=1000?num:null;}
+    function answerQuestion(question){const q=normalize(question);const userBookings=data.bookings.filter(b=>b.email===data.session.email);const rooms=data.rooms.filter(r=>r.status==='available');const guestMatch=q.match(/(\d+)\s*(?:khach|nguoi)/);const guestCount=guestMatch?Number(guestMatch[1]):null;const budget=parseBudget(q);const services=data.services;const total=data.bookings.reduce((n,b)=>n+Number(b.amount||0),0);const paid=data.bookings.filter(b=>b.paid).reduce((n,b)=>n+Number(b.amount||0),0);const avg=data.reviews.length?(data.reviews.reduce((n,r)=>n+r.rating,0)/data.reviews.length).toFixed(1):'0.0';
+      if(/^(xin chao|chao|hello|hi|hey|alo)( lumiere)?$/.test(q))return `Xin chào ${data.session.name.split(' ').pop()}! Bạn muốn hỏi về phòng, giá, đặt phòng, dịch vụ hay đánh giá?`;
+      if(q.includes('thuat toan')||q.includes('ai hoat dong')||q.includes('cach ai')||q.includes('ban la ai'))return 'Tôi là trợ lý quy tắc chạy ngay trong trình duyệt, không gửi dữ liệu ra dịch vụ AI bên ngoài. Tôi nhận diện nhóm câu hỏi tiếng Việt rồi tra cứu trạng thái phòng, giá, dịch vụ, đánh giá và đặt phòng hiện có. Với câu hỏi ngoài dữ liệu demo, tôi sẽ nói rõ thay vì tự tạo thông tin.';
+      if(isAdmin()&&(q.includes('doanh thu')||q.includes('doanh so')||q.includes('cong no')||q.includes('da thu')||q.includes('bao cao')||q.includes('tien phong')))return `Báo cáo theo dữ liệu hiện tại: tổng giá trị đặt phòng ${money(total)}, đã thanh toán ${money(paid)}, còn phải thu ${money(total-paid)} trên ${data.bookings.length} lượt đặt. Đây là tổng dữ liệu demo, không phải số liệu kế toán thực.`;
+      if(isAdmin()&&(q.includes('cong suat')||q.includes('phong dang o')||q.includes('tinh trang phong')))return `Hiện có ${rooms.length} phòng sẵn sàng, ${data.rooms.filter(r=>r.status==='occupied').length} phòng đang có khách, ${data.rooms.filter(r=>r.status==='cleaning').length} phòng đang dọn và ${data.rooms.filter(r=>r.status==='maintenance').length} phòng bảo trì.`;
+      if(q.includes('lich dat cua toi')||q.includes('dat phong cua toi')||q.includes('booking cua toi'))return userBookings.length?`Bạn có ${userBookings.length} lượt đặt: ${userBookings.map(b=>`${b.id}, phòng ${b.room}, ${b.checkIn} đến ${b.checkOut}, trạng thái ${b.status}`).join('; ')}.`:'Email tài khoản này chưa có lượt đặt phòng nào.';
+      if(q.includes('danh gia')||q.includes('nhan xet')||q.includes('review'))return data.reviews.length?`Điểm trung bình hiện là ${avg}/5 từ ${data.reviews.length} đánh giá. Nhận xét gần nhất: “${data.reviews[0].comment}”`:'Hiện chưa có đánh giá nào.';
+      if(q.includes('dich vu')||q.includes('massage')||q.includes('buffet')||q.includes('giat ui')||q.includes('don san bay')){const matching=services.filter(s=>!budget||s.price<=budget);return matching.length?`Dịch vụ${budget?` trong mức ${money(budget)}`:''}: ${matching.map(s=>`${s.name} ${money(s.price)} ${s.unit}`).join('; ')}.`:'Chưa có dịch vụ phù hợp mức giá đó. Bạn có thể hỏi bảng giá đầy đủ.';}
+      if(q.includes('gia')||q.includes('bao nhieu')||q.includes('chi phi')||q.includes('ngan sach')||budget){const matches=rooms.filter(r=>(!budget||r.price<=budget)&&(!guestCount||r.capacity>=guestCount)&&(!q.includes('giuong don')||normalize(r.beds).includes('giuong don'))&&(!q.includes('giuong doi')||normalize(r.beds).includes('giuong doi')));if(matches.length)return `Phòng đang sẵn sàng phù hợp${guestCount?` ${guestCount} khách`:''}${budget?` và ngân sách ${money(budget)}/đêm`:''}: ${matches.map(r=>`${r.type} (${r.id}), ${money(r.price)}/đêm, tối đa ${r.capacity} khách`).join('; ')}.`;return budget||guestCount?'Hiện chưa có phòng trống phù hợp các điều kiện đó. Thử tăng ngân sách hoặc giảm số khách nhé.':`Giá phòng trống từ ${rooms.length?money(Math.min(...rooms.map(r=>r.price))):'chưa có'} đến ${rooms.length?money(Math.max(...rooms.map(r=>r.price))):'chưa có'} mỗi đêm.`;}
+      if(q.includes('phong')||q.includes('room'))return rooms.length?`Có ${rooms.length} phòng sẵn sàng: ${rooms.map(r=>`${r.type} (${r.id}, ${money(r.price)}/đêm, ${r.beds})`).join('; ')}.`:'Hiện chưa có phòng sẵn sàng.';
+      if(q.includes('dat phong')||q.includes('huy phong')||q.includes('huy dat'))return 'Để đặt phòng, mở mục Phòng, chọn phòng có trạng thái Sẵn sàng rồi điền ngày lưu trú và số khách. Bạn có thể hủy lượt đặt đang chờ xác nhận hoặc đã xác nhận trong mục Đặt phòng.';
+      if(q.includes('check in')||q.includes('check out')||q.includes('nhan phong')||q.includes('tra phong'))return 'Trong bản demo, ngày nhận/trả phòng được chọn trong biểu mẫu đặt phòng. Quy định giờ nhận phòng, trả phòng và phụ phí chưa được khai báo trong dữ liệu, nên tôi không tự suy đoán.';
+      if(q.includes('dang nhap')||q.includes('tai khoan')||q.includes('mat khau')||q.includes('quen mat khau'))return 'Bạn có thể đăng ký tài khoản khách hàng từ màn hình đăng nhập. Tính năng quên mật khẩu chỉ mô phỏng trong bản demo, chưa gửi email thật.';
+      if(q.includes('xin loi')||q.includes('cam on'))return 'Rất vui được hỗ trợ. Bạn cứ hỏi về phòng, giá, dịch vụ, đánh giá hoặc đặt phòng nhé.';
+      return 'Tôi chưa tìm thấy dữ liệu để trả lời câu này. Tôi hỗ trợ tra cứu phòng trống, giá và ngân sách, dịch vụ, đánh giá, lịch đặt; tài khoản quản trị còn có thể hỏi doanh thu và tình trạng vận hành. Hãy thử hỏi cụ thể hơn.';
+    }
+    function sendChat(question){const text=String(question||'').trim();if(!text)return;chatMessages.push({from:'user',text},{from:'ai',text:answerQuestion(text)});chatMessages=chatMessages.slice(-24);chatOpen=true;render();const log=document.getElementById('chat-log');if(log)log.scrollTop=log.scrollHeight;}
+    document.addEventListener('click',event=>{const pageButton=event.target.closest('[data-page]');if(pageButton){page=pageButton.dataset.page;document.getElementById('sidebar')?.classList.remove('open');render();return;}const roleButton=event.target.closest('[data-role]');if(roleButton){selectedRole=roleButton.dataset.role;renderAuth();return;}const authButton=event.target.closest('[data-auth]');if(authButton){authMode=authButton.dataset.auth;renderAuth();return;}const questionButton=event.target.closest('[data-question]');if(questionButton){sendChat(questionButton.dataset.question);return;}const actionButton=event.target.closest('[data-action]');if(!actionButton)return;const action=actionButton.dataset.action;switch(action){case'menu':document.getElementById('sidebar')?.classList.toggle('open');break;case'logout':data.session=null;save();chatMessages=[];render();break;case'chat-open':chatOpen=true;render();break;case'chat-close':chatOpen=false;render();break;case'close-modal':if(event.target.classList.contains('overlay')||event.target===actionButton)closeModal();break;case'book':bookRoom(actionButton.dataset.room);break;case'add-room':showRoomForm();break;case'edit-room':showRoomForm(data.rooms.find(r=>r.id===actionButton.dataset.room));break;case'add-service':showServiceForm();break;case'edit-service':showServiceForm(data.services.find(s=>s.name===actionButton.dataset.name));break;case'delete-service':data.services=data.services.filter(s=>s.name!==actionButton.dataset.name);save();render();notify('Đã xóa dịch vụ.');break;case'add-staff':showStaffForm();break;case'toggle-staff':{const user=data.users.find(u=>u.email===actionButton.dataset.email);if(user){user.active=!user.active;save();render();notify('Đã cập nhật tài khoản nhân viên.');}break;}case'cancel-booking':{const booking=data.bookings.find(b=>b.id===actionButton.dataset.id);if(booking){booking.status='Đã hủy';const room=data.rooms.find(r=>r.id===booking.room);if(room)room.status='available';save();render();notify('Đã hủy đặt phòng.');}break;}case'checkout':{const booking=data.bookings.find(b=>b.id===actionButton.dataset.id);if(booking){booking.status='Đã trả phòng';const room=data.rooms.find(r=>r.id===booking.room);if(room)room.status='cleaning';data.requests.unshift({id:`YC-${Date.now().toString().slice(-4)}`,bookingId:booking.id,guest:booking.guest,room:booking.room,title:'Dọn phòng sau khi trả phòng',detail:'Kiểm tra phòng và chuyển sang trạng thái chờ vệ sinh.',status:'Chờ tiếp nhận'});save();render();notify('Đã trả phòng và tạo yêu cầu vệ sinh.');}break;}case'review':showReviewForm(actionButton.dataset.id);break;case'notifications':notify(data.bookings.length?`Có ${data.bookings.length} lượt đặt phòng trong dữ liệu demo.`:'Chưa có thông báo mới.');break;}}
+    );
+    document.addEventListener('input',event=>{if(event.target.id==='room-search'){roomSearch=event.target.value;const query=normalize(roomSearch);const rooms=data.rooms.filter(r=>normalize(`${r.id} ${r.type} ${r.floor}`).includes(query));const grid=document.getElementById('room-grid');if(grid)grid.innerHTML=rooms.length?rooms.map(roomCard).join(''):'<div class="empty">Không tìm thấy phòng phù hợp.</div>';}});
+    document.addEventListener('change',event=>{const target=event.target;if(target.id==='room-filter'){const status=target.value;const query=normalize(roomSearch);const rooms=data.rooms.filter(r=>(status==='all'||r.status===status)&&normalize(`${r.id} ${r.type} ${r.floor}`).includes(query));document.getElementById('room-grid').innerHTML=rooms.length?rooms.map(roomCard).join(''):'<div class="empty">Không có phòng phù hợp.</div>';return;}if(target.dataset.roomStatus){const room=data.rooms.find(r=>r.id===target.dataset.roomStatus);if(room){room.status=target.value;save();render();notify('Đã cập nhật trạng thái phòng.');}}if(target.dataset.bookingStatus){const booking=data.bookings.find(b=>b.id===target.dataset.bookingStatus);if(booking){booking.status=target.value;save();render();notify('Đã cập nhật trạng thái đặt phòng.');}}if(target.dataset.requestStatus){const request=data.requests.find(r=>r.id===target.dataset.requestStatus);if(request){request.status=target.value;save();notify('Đã cập nhật yêu cầu.');}}if(target.dataset.paid){const booking=data.bookings.find(b=>b.id===target.dataset.paid);if(booking){booking.paid=target.checked;save();}}});
+    document.addEventListener('submit',event=>{const form=event.target;event.preventDefault();const values=Object.fromEntries(new FormData(form).entries());if(form.id==='auth-form'){if(authMode==='login'){login(values.email,values.password,selectedRole);return;}if(authMode==='register'){if(data.users.some(user=>user.email.toLowerCase()===values.email.toLowerCase())){notify('Email này đã được đăng ký.');return;}const user={email:values.email,password:values.password,name:values.name,phone:values.phone||'',role:'guest',active:true};data.users.push(user);data.session={email:user.email,name:user.name,role:'guest',phone:user.phone};save();render();notify('Tạo tài khoản thành công.');return;}notify('Nếu email thuộc tài khoản demo, hướng dẫn sẽ được gửi theo quy trình thật khi tích hợp backend.');authMode='login';render();return;}if(form.id==='chat-form'){sendChat(values.question);return;}if(form.id==='booking-form'){const roomId=document.querySelector('#modal-root [data-room]')?.dataset.room;const room=data.rooms.find(r=>r.id===roomId);const checkIn=new Date(values.checkIn),checkOut=new Date(values.checkOut);if(!room){notify('Không tìm thấy phòng.');return;}if(checkOut<=checkIn){notify('Ngày trả phòng phải sau ngày nhận phòng.');return;}const nights=Math.max(1,Math.round((checkOut-checkIn)/86400000));const selected=[...form.querySelectorAll('input[name="service"]:checked')].map(input=>data.services[Number(input.value)]).filter(Boolean);const amount=room.price*nights+selected.reduce((sum,s)=>sum+s.price,0);const booking={id:`BK-${Date.now().toString().slice(-6)}`,room:room.id,type:room.type,guest:data.session.name,email:data.session.email,checkIn:values.checkIn,checkOut:values.checkOut,guests:Number(values.guests),amount,status:'Chờ xác nhận',services:selected,paid:false};data.bookings.unshift(booking);room.status='occupied';for(const service of selected)data.requests.unshift({id:`YC-${Date.now().toString().slice(-4)}`,bookingId:booking.id,guest:booking.guest,room:room.id,title:service.name,detail:`Khách đặt dịch vụ ${service.name}.`,status:'Chờ tiếp nhận'});save();closeModal();page='bookings';render();notify('Đã tạo lượt đặt phòng.');return;}if(form.id==='room-form'){const original=values.originalId;const room={id:values.id.trim(),type:values.type.trim(),floor:values.floor.trim(),price:Number(values.price),capacity:Number(values.capacity),beds:values.beds.trim(),features:values.features.trim(),status:'available'};if(!original&&data.rooms.some(r=>r.id===room.id)){notify('Mã phòng đã tồn tại.');return;}if(original){data.rooms=data.rooms.map(r=>r.id===original?{...r,...room,status:r.status}:r);}else data.rooms.push(room);save();closeModal();render();notify('Đã lưu thông tin phòng.');return;}if(form.id==='service-form'){const service={name:values.name.trim(),category:values.category.trim(),price:Number(values.price),unit:values.unit.trim(),icon:'✦'};if(values.originalName)data.services=data.services.map(s=>s.name===values.originalName?service:s);else data.services.push(service);save();closeModal();render();notify('Đã lưu dịch vụ.');return;}if(form.id==='staff-form'){if(data.users.some(u=>u.email.toLowerCase()===values.email.toLowerCase())){notify('Email đã tồn tại.');return;}data.users.push({name:values.name,email:values.email,password:values.password,role:'staff',active:true,phone:''});save();closeModal();render();notify('Đã tạo tài khoản nhân viên.');return;}if(form.id==='settings-form'){data.session.name=values.name.trim();data.session.phone=values.phone.trim();const user=data.users.find(u=>u.email===data.session.email);if(user){user.name=data.session.name;user.phone=data.session.phone;}save();render();notify('Đã lưu cài đặt tài khoản.');return;}if(form.id==='review-form'){data.reviews.unshift({guest:data.session.name,rating:Number(values.rating),comment:values.comment.trim()});save();closeModal();render();notify('Cảm ơn bạn đã gửi đánh giá.');}});
+    document.addEventListener('click',event=>{const bookButton=event.target.closest('[data-action="book"]');if(bookButton)selectedRoomId=bookButton.dataset.room;},true);
+    document.addEventListener('submit',event=>{if(event.target.id==='booking-form')event.target.dataset.room=selectedRoomId;},true);
+    let showLogin = false;
+    let siteSearch = {checkIn:isoDate(1),checkOut:isoDate(2),guests:2};
+    let siteFiltered = false;
+    let showAllServices = false;
+    let reviewsExpanded = false;
+
+    function renderWebsite(){
+      const available=data.rooms.filter(room=>room.status==='available');
+      const filtered=siteFiltered?available.filter(room=>room.capacity>=Number(siteSearch.guests||1)):available;
+      const photos=[
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1000&q=85',
+        'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1000&q=85',
+        'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=85',
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=85',
+        'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=1000&q=85',
+        'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1000&q=85'
+      ];
+      const services=showAllServices?data.services:data.services.slice(0,4);
+      document.getElementById('app').innerHTML=`<main class="hotel-site">
+        <header class="site-nav"><a class="site-brand" href="#home"><span class="brand-mark">L</span><span class="brand">LUMIÈRE<small>HOTEL · DA NANG</small></span></a><nav class="site-links"><a href="#rooms">Phòng nghỉ</a><a href="#experience">Trải nghiệm</a><a href="#reviews">Đánh giá</a><button class="site-staff" data-action="show-login">Đăng Nhập</button></nav></header>
+        <section class="site-hero" id="home"><img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2200&q=90" alt="Không gian nghỉ dưỡng tại Lumière Hotel" fetchpriority="high"><div class="hero-mark">L</div><div class="hero-copy"><span class="eyebrow">Một chốn nghỉ bên sông</span><h1>Lumière Hotel</h1><p>Khoảng lặng tinh tế giữa nhịp sống Đà Nẵng. Chọn căn phòng cho kỳ nghỉ tiếp theo của bạn.</p></div></section>
+        <form class="site-booking" id="site-booking"><label>Nhận phòng<input name="checkIn" type="date" min="${isoDate(0)}" value="${escapeHtml(siteSearch.checkIn)}" required></label><label>Trả phòng<input name="checkOut" type="date" min="${isoDate(1)}" value="${escapeHtml(siteSearch.checkOut)}" required></label><label>Số khách<select name="guests">${[1,2,3,4].map(count=>`<option value="${count}" ${Number(siteSearch.guests)===count?'selected':''}>${count} khách</option>`).join('')}</select></label><button>Tìm phòng phù hợp</button></form>
+        <div class="site-strip"><span><b>✳</b> Nghỉ dưỡng tinh tế</span><span><b>⌂</b> Phòng cho mọi hành trình</span><span><b>✦</b> Chăm chút từng trải nghiệm</span></div>
+        <section class="site-section" id="rooms"><div class="site-section-head"><div><span class="eyebrow">Không gian lưu trú</span><h2>${siteFiltered?'Phòng phù hợp với bạn':'Chọn căn phòng của riêng mình'}</h2></div><p>${siteFiltered?`Phòng còn trống cho ${siteSearch.guests} khách, từ ${siteSearch.checkIn} đến ${siteSearch.checkOut}.`:'Mỗi căn phòng là một cách khác nhau để chậm lại, nghỉ ngơi và tận hưởng thành phố.'}</p></div><div class="site-room-grid">${filtered.length?filtered.map((room,index)=>`<article class="site-room"><img src="${photos[index%photos.length]}" alt="${escapeHtml(room.type)} tại Lumière Hotel" loading="lazy"><div class="site-room-body"><div class="site-room-top"><h3>${escapeHtml(room.type)}</h3><span class="badge">Còn phòng</span></div><p>${escapeHtml(room.features||'Không gian nghỉ dưỡng tiện nghi')} · ${escapeHtml(room.beds)} · tối đa ${room.capacity} khách</p><div class="site-room-price">${money(room.price)} <small>/ đêm</small></div><button class="primary" data-action="book" data-room="${escapeHtml(room.id)}">Xem phòng & đặt</button></div></article>`).join(''):'<div class="site-empty">Chưa có phòng phù hợp với số khách đã chọn. Thử điều chỉnh tìm kiếm hoặc chat với Lumière AI để được gợi ý.</div>'}</div></section>
+        <section class="site-story" id="experience"><img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1300&q=85" alt="Không gian thư giãn của khách sạn" loading="lazy"><div class="site-story-copy"><span class="eyebrow">Chạm vào nhịp nghỉ riêng</span><h2>Để mỗi ngày trôi qua thật nhẹ nhàng.</h2><p>Từ bữa sáng thong thả đến những dịch vụ chăm sóc chu đáo, đội ngũ Lumière tạo nên không gian để bạn dành trọn thời gian cho điều mình yêu thích.</p><button class="secondary" data-site-scroll="services">Khám phá dịch vụ ↓</button></div></section>
+        <section class="site-section" id="services"><div class="site-section-head"><div><span class="eyebrow">Thêm vào kỳ nghỉ</span><h2>Những điều nhỏ, niềm vui lớn</h2></div><p>Chọn thêm trải nghiệm phù hợp ngay trong quá trình đặt phòng.</p></div><div class="site-service-list">${services.map(service=>`<article class="site-service"><span class="service-icon">${escapeHtml(service.icon||'✦')}</span><strong>${escapeHtml(service.name)}</strong><small>${escapeHtml(service.category)} · ${money(service.price)} ${escapeHtml(service.unit)}</small></article>`).join('')}</div>${data.services.length>4?`<button class="text-button" data-action="toggle-services" style="margin-top:18px">${showAllServices?'Thu gọn dịch vụ':'Xem tất cả dịch vụ'}</button>`:''}</section>
+        <section class="site-review-section" id="reviews"><div class="site-review-heading"><div><span class="eyebrow">Đánh giá từ khách lưu trú · dữ liệu demo</span><h2>Những câu chuyện sau kỳ nghỉ.</h2></div><div class="site-review-summary"><strong>${data.reviews.length?(data.reviews.reduce((sum,review)=>sum+Number(review.rating||0),0)/data.reviews.length).toFixed(1):'0.0'}</strong><span class="rating">★★★★★</span><span>${data.reviews.length} đánh giá</span></div></div><div class="site-review-grid ${reviewsExpanded?'is-expanded':'is-collapsed'}" id="site-review-list">${data.reviews.map(review=>`<article class="site-review-card"><div class="rating">${'★'.repeat(Math.max(0,Math.min(5,Number(review.rating)||0)))}${'☆'.repeat(5-Math.max(0,Math.min(5,Number(review.rating)||0)))}</div><p>“${escapeHtml(review.comment)}”</p><div class="site-review-author"><strong>${escapeHtml(review.guest)}</strong><small>Khách lưu trú Lumière Hotel</small></div></article>`).join('')}</div>${data.reviews.length>3?`<button class="site-review-toggle" type="button" data-action="toggle-reviews" aria-controls="site-review-list" aria-expanded="${reviewsExpanded}">${reviewsExpanded?'Thu gọn đánh giá':`Xem tất cả ${data.reviews.length} đánh giá`}</button>`:''}</section>
+        <section class="site-contact"><div><span class="eyebrow">Kỳ nghỉ tiếp theo bắt đầu từ đây</span><h2>Hẹn gặp bạn tại Lumière.</h2><p>Chọn phòng hoặc trò chuyện với trợ lý để tìm lựa chọn phù hợp.</p></div><button class="primary" data-site-scroll="rooms">Khám phá phòng</button></section>
+        <footer class="site-footer"><span>LUMIÈRE HOTEL · DA NANG<br><span style="color:#99b0a5">Một chốn nghỉ bên sông.</span></span><span>Bản demo quản lý khách sạn</span><button data-action="show-login">Đăng Nhập</button></footer>
+      </main>${renderChat()}`;
+    }
+
+    function render(){
+      if(!data.session){if(showLogin)renderAuth();else renderWebsite();return;}
+      const nav=navItems();if(!nav.some(item=>item[0]===page))page='dashboard';
+      document.getElementById('app').innerHTML=`<div class="app-shell"><aside class="sidebar" id="sidebar"><div class="brand"><span class="brand-mark">L</span><span>LUMIÈRE<small>HOTEL MANAGEMENT</small></span></div><span class="nav-label">Không gian làm việc</span><nav class="nav-list">${nav.map(([id,icon,label])=>`<button data-page="${id}" class="${page===id?'active':''}"><span class="nav-symbol">${icon}</span>${label}</button>`).join('')}</nav><div class="side-bottom"><div class="row"><span class="avatar">${escapeHtml(data.session.name.slice(0,1))}</span><span><strong>${escapeHtml(data.session.name)}</strong><br><span class="muted">${roleName(data.session.role)}</span></span></div><button class="text-button" data-action="logout" style="margin-top:13px">Đăng xuất</button></div></aside><main class="main-area"><header class="topbar"><div class="row"><button class="icon-button mobile-menu" data-action="menu" aria-label="Mở menu">☰</button><button class="text-button" data-action="site-home">Lumière Hotel ↗</button><span class="topbar-title">/ ${pageTitle[page]}</span></div><div class="top-actions"><button class="icon-button" data-action="notifications" aria-label="Thông báo">♧</button><span class="user-chip"><span class="avatar">${escapeHtml(data.session.name.slice(0,1))}</span><span>${escapeHtml(data.session.name)}</span></span></div></header><section class="page-wrap">${renderPage()}</section></main></div>${renderChat()}`;
+    }
+
+    function renderChat(){
+      const publicVisitor=!data.session;
+      const title=publicVisitor?'Hỏi về phòng và trải nghiệm':isAdmin()?'Hỗ trợ báo cáo và vận hành':'Tư vấn phòng, giá và dịch vụ';
+      const welcome=publicVisitor?'Xin chào! Tôi có thể giúp bạn tìm phòng, chọn dịch vụ hoặc trả lời câu hỏi về kỳ nghỉ tại Lumière.':isAdmin()?'Xin chào. Tôi có thể tra cứu doanh thu, tình trạng phòng, đặt phòng và dịch vụ từ dữ liệu demo.':`Xin chào ${data.session.name.split(' ').pop()}! Tôi có thể tìm phòng phù hợp, kiểm tra giá, dịch vụ, đánh giá và lịch đặt của bạn.`;
+      if(!chatMessages.length)chatMessages=[{from:'ai',text:welcome}];
+      const suggestions=publicVisitor?['Phòng dưới 2 triệu','Dịch vụ có gì?','Cách đặt phòng?']:isAdmin()?['Báo cáo doanh thu','Phòng nào đang trống?','Đặt phòng chờ xác nhận']:['Gợi ý phòng dưới 3 triệu cho 3 người','Dịch vụ dưới 500 nghìn','Lịch đặt của tôi'];
+      return `<div class="chat-wrap">${chatOpen?`<section class="chat-panel"><header class="chat-head"><div><strong>Lumière AI</strong><small>${title} · Trợ lý dữ liệu</small></div><button data-action="chat-close" aria-label="Đóng chat">×</button></header><div class="chat-log" id="chat-log">${chatMessages.map(message=>`<div class="chat-message ${message.from}">${escapeHtml(message.text)}</div>`).join('')}</div><div class="suggestions">${suggestions.map(text=>`<button data-question="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join('')}</div><form id="chat-form" class="chat-form"><input name="question" placeholder="Nhập câu hỏi..." aria-label="Nhập câu hỏi cho Lumière AI" autocomplete="off"><button aria-label="Gửi câu hỏi">Gửi</button></form></section>`:`<button class="chat-toggle" data-action="chat-open"><span>✦</span>Lumière AI</button>`}</div>`;
+    }
+
+    function parseBudget(text){
+      const normalized=normalize(text);
+      const match=normalized.match(/(?:duoi|toi da|ngan sach|khong qua|khoang|tam)\s*(\d+(?:[.,]\d+)?)\s*(trieu|tr|nghin|ngan|k|vnd|dong)?|(?:^|\s)(\d+(?:[.,]\d+)?)\s*(trieu|tr|nghin|ngan|k|vnd|dong)\b/);
+      if(!match)return null;
+      const value=Number((match[1]||match[3]).replace(',','.'));
+      const unit=match[2]||match[4]||'';
+      if(unit==='trieu'||unit==='tr')return value*1000000;
+      if(unit==='nghin'||unit==='ngan'||unit==='k')return value*1000;
+      if(unit==='vnd'||unit==='dong')return value;
+      return value>=1000?value:null;
+    }
+
+    function answerQuestion(question){
+      const q=normalize(question);
+      const userBookings=data.session?data.bookings.filter(booking=>booking.email===data.session.email):[];
+      const available=data.rooms.filter(room=>room.status==='available');
+      const budget=parseBudget(question);
+      const guestMatch=q.match(/(\d+)\s*(?:khach|nguoi)/);
+      const guestCount=guestMatch?Number(guestMatch[1]):null;
+      const total=data.bookings.reduce((sum,booking)=>sum+Number(booking.amount||0),0);
+      const paid=data.bookings.filter(booking=>booking.paid).reduce((sum,booking)=>sum+Number(booking.amount||0),0);
+      const serviceTotal=data.bookings.reduce((sum,booking)=>sum+(booking.services||[]).reduce((value,service)=>value+Number(service.price||0),0),0);
+      const roomTotal=total-serviceTotal;
+      const greetingName=data.session?.name.split(' ').pop()||'bạn';
+      if(/^(xin chao|chao|hello|hi|hey|alo)( lumiere)?$/.test(q))return `Xin chào ${greetingName}! Bạn muốn tìm phòng, xem giá, dịch vụ hay hỏi về cách đặt phòng?`;
+      if(q.includes('thuat toan')||q.includes('ai hoat dong')||q.includes('cach ai')||q.includes('ban la ai'))return 'Tôi là trợ lý quy tắc dùng dữ liệu demo tại chỗ, không gửi câu hỏi ra dịch vụ bên ngoài. Tôi có thể tra phòng, giá, sức chứa, tiện nghi, dịch vụ, đánh giá và đặt phòng; câu hỏi ngoài phạm vi sẽ được báo rõ.';
+      if(isAdmin()&&(/doanh thu|doanh so|cong no|da thu|bao cao/.test(q))){if(q.includes('dich vu'))return `Tổng tiền dịch vụ đính kèm đặt phòng hiện có là ${money(serviceTotal)}. Bảng giá: ${data.services.map(service=>`${service.name} ${money(service.price)}`).join('; ')}.`;if(q.includes('tien phong'))return `Tổng giá trị đặt phòng hiện tại là ${money(total)}, gồm tiền phòng ước tính ${money(roomTotal)} và tiền dịch vụ đã ghi nhận ${money(serviceTotal)}.`;return `Tổng giá trị đặt phòng ${money(total)}, đã thanh toán ${money(paid)}, còn phải thu ${money(total-paid)} trên ${data.bookings.length} lượt đặt. Đây là số liệu demo.`;}
+      if(isAdmin()&&(/cong suat|phong dang o|tinh trang phong/.test(q)))return `Hiện có ${available.length} phòng sẵn sàng, ${data.rooms.filter(room=>room.status==='occupied').length} phòng đang có khách, ${data.rooms.filter(room=>room.status==='cleaning').length} phòng đang dọn và ${data.rooms.filter(room=>room.status==='maintenance').length} phòng bảo trì.`;
+      if(q.includes('lich dat cua toi')||q.includes('dat phong cua toi')||q.includes('booking cua toi'))return userBookings.length?`Bạn có ${userBookings.length} lượt đặt: ${userBookings.map(booking=>`${booking.id}, phòng ${booking.room}, ${booking.checkIn} đến ${booking.checkOut}, trạng thái ${booking.status}`).join('; ')}.`:'Tôi chưa thấy lượt đặt gắn với tài khoản này. Bạn có thể tra cứu bằng email đã dùng khi đặt.';
+      if(q.includes('danh gia')||q.includes('nhan xet')||q.includes('review')){const average=data.reviews.length?(data.reviews.reduce((sum,review)=>sum+Number(review.rating||0),0)/data.reviews.length).toFixed(1):'0.0';return data.reviews.length?`Khách lưu trú đánh giá Lumière ${average}/5 từ ${data.reviews.length} lượt. Nhận xét gần nhất: “${data.reviews[0].comment}”`:'Hiện chưa có đánh giá nào.';}
+      if(q.includes('dich vu')||q.includes('massage')||q.includes('buffet')||q.includes('giat ui')||q.includes('don san bay')){const matches=data.services.filter(service=>!budget||service.price<=budget);return matches.length?`Dịch vụ${budget?` đến ${money(budget)}`:''}: ${matches.map(service=>`${service.name} ${money(service.price)} ${service.unit}`).join('; ')}.`:'Chưa có dịch vụ phù hợp mức giá đó.';}
+      if(q.includes('gia')||q.includes('bao nhieu')||q.includes('chi phi')||q.includes('ngan sach')||budget||guestCount){const matches=available.filter(room=>(!budget||room.price<=budget)&&(!guestCount||room.capacity>=guestCount)&&(!q.includes('giuong don')||normalize(room.beds).includes('giuong don'))&&(!q.includes('giuong doi')||normalize(room.beds).includes('giuong doi')));return matches.length?`Phòng còn trống phù hợp${guestCount?` ${guestCount} khách`:''}${budget?` với ngân sách ${money(budget)}/đêm`:''}: ${matches.map(room=>`${room.type} (${room.id}), ${money(room.price)}/đêm, tối đa ${room.capacity} khách`).join('; ')}.`:budget||guestCount?'Chưa có phòng trống đáp ứng đủ ngân sách và số khách. Bạn có thể tăng ngân sách hoặc giảm số khách.':available.length?`Giá phòng trống từ ${money(Math.min(...available.map(room=>room.price)))} đến ${money(Math.max(...available.map(room=>room.price)))}/đêm.`:'Hiện chưa có phòng sẵn sàng.';}
+      if(q.includes('phong')||q.includes('room'))return available.length?`Đang có ${available.length} phòng trống: ${available.map(room=>`${room.type} (${room.id}), ${money(room.price)}/đêm, tối đa ${room.capacity} khách`).join('; ')}.`:'Hiện chưa có phòng sẵn sàng.';
+      if(q.includes('dat phong')||q.includes('huy phong')||q.includes('huy dat'))return 'Bạn có thể chọn ngày ở trên trang, chọn một phòng còn trống rồi điền thông tin liên hệ để gửi yêu cầu đặt. Nếu đã đăng nhập, lịch đặt sẽ được lưu trong tài khoản.';
+      if(q.includes('check in')||q.includes('check out')||q.includes('nhan phong')||q.includes('tra phong'))return 'Bạn chọn ngày nhận và trả phòng trong biểu mẫu tìm phòng. Bản demo chưa công bố giờ nhận/trả phòng hoặc chính sách phụ phí, nên tôi không tự suy đoán.';
+      if(q.includes('tai khoan')||q.includes('mat khau')||q.includes('quen mat khau'))return 'Bạn có thể đặt phòng với thông tin liên hệ mà không cần tạo tài khoản. Nhân viên có thể đăng nhập qua nút Khu vực nhân viên; khôi phục mật khẩu hiện chỉ mô phỏng.';
+      if(q.includes('cam on')||q.includes('xin loi'))return 'Rất vui được hỗ trợ. Bạn cứ hỏi về phòng, giá, dịch vụ hoặc cách đặt nhé.';
+      return 'Tôi chưa tìm thấy dữ liệu cho câu hỏi này. Tôi hỗ trợ tra cứu phòng trống, giá và ngân sách, sức chứa, dịch vụ, đánh giá, đặt phòng và chính sách được khai báo trong demo. Hãy thử hỏi cụ thể hơn.';
+    }
+
+    function sendChat(question){const text=String(question||'').trim();if(!text)return;chatMessages.push({from:'user',text},{from:'ai',text:answerQuestion(text)});chatMessages=chatMessages.slice(-24);chatOpen=true;render();const log=document.getElementById('chat-log');if(log)log.scrollTop=log.scrollHeight;}
+
+    function bookRoom(roomId){
+      const room=data.rooms.find(item=>item.id===roomId);
+      if(!room||room.status!=='available')return;
+      selectedRoomId=room.id;
+      const contactFields=data.session?'':`<label class="field">Họ và tên<input name="guestName" required autocomplete="name"></label><label class="field">Email liên hệ<input name="guestEmail" type="email" required autocomplete="email"></label><label class="field">Số điện thoại<input name="guestPhone" type="tel" autocomplete="tel"></label>`;
+      openModal('Gửi yêu cầu đặt phòng',`<form id="booking-form"><div class="notice" style="margin-bottom:14px">${escapeHtml(room.type)} · ${money(room.price)} mỗi đêm · tối đa ${room.capacity} khách</div><div class="form-grid">${contactFields}<label class="field">Ngày nhận phòng<input name="checkIn" type="date" required min="${isoDate(0)}" value="${escapeHtml(siteSearch.checkIn||isoDate(1))}"></label><label class="field">Ngày trả phòng<input name="checkOut" type="date" required min="${isoDate(1)}" value="${escapeHtml(siteSearch.checkOut||isoDate(2))}"></label><label class="field">Số khách<input name="guests" type="number" min="1" max="${room.capacity}" value="${Math.min(Number(siteSearch.guests||1),room.capacity)}" required></label><div class="field wide">Dịch vụ thêm${data.services.map((service,index)=>`<label class="check-row"><input type="checkbox" name="service" value="${index}"> ${escapeHtml(service.name)} · ${money(service.price)}</label>`).join('')}</div></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Đóng</button><button class="primary">Gửi yêu cầu</button></div></form>`);
+    }
+
+    document.addEventListener('click',event=>{
+      const loginButton=event.target.closest('[data-action="show-login"]');
+      if(loginButton){event.preventDefault();showLogin=true;authMode='login';renderAuth();return;}
+      const homeButton=event.target.closest('[data-action="site-home"]');
+      if(homeButton){data.session=null;save();showLogin=false;page='dashboard';render();return;}
+      const scrollButton=event.target.closest('[data-site-scroll]');
+      if(scrollButton){document.getElementById(scrollButton.dataset.siteScroll)?.scrollIntoView({behavior:'smooth'});return;}
+      const serviceToggle=event.target.closest('[data-action="toggle-services"]');
+      if(serviceToggle){showAllServices=!showAllServices;renderWebsite();document.getElementById('services')?.scrollIntoView();}
+      const reviewToggle=event.target.closest('[data-action="toggle-reviews"]');
+      if(reviewToggle){reviewsExpanded=!reviewsExpanded;renderWebsite();document.getElementById('reviews')?.scrollIntoView({behavior:'smooth',block:'start'});}
+    },true);
+
+    document.addEventListener('submit',event=>{
+      if(event.target.id==='site-booking'){
+        event.preventDefault();event.stopImmediatePropagation();
+        const values=Object.fromEntries(new FormData(event.target).entries());
+        if(new Date(values.checkOut)<=new Date(values.checkIn)){notify('Ngày trả phòng phải sau ngày nhận phòng.');return;}
+        siteSearch={checkIn:values.checkIn,checkOut:values.checkOut,guests:Number(values.guests)};siteFiltered=true;renderWebsite();document.getElementById('rooms')?.scrollIntoView({behavior:'smooth'});return;
+      }
+      if(event.target.id==='booking-form'){
+        event.preventDefault();event.stopImmediatePropagation();
+        const form=event.target;const values=Object.fromEntries(new FormData(form).entries());
+        const room=data.rooms.find(item=>item.id===selectedRoomId);
+        if(!room||room.status!=='available'){notify('Phòng này vừa không còn sẵn sàng.');closeModal();render();return;}
+        if(new Date(values.checkOut)<=new Date(values.checkIn)){notify('Ngày trả phòng phải sau ngày nhận phòng.');return;}
+        const nights=Math.max(1,Math.round((new Date(values.checkOut)-new Date(values.checkIn))/86400000));
+        const selected=[...form.querySelectorAll('input[name="service"]:checked')].map(input=>data.services[Number(input.value)]).filter(Boolean);
+        const guestName=data.session?.name||String(values.guestName||'').trim();
+        const guestEmail=data.session?.email||String(values.guestEmail||'').trim();
+        if(!guestName||!guestEmail){notify('Vui lòng nhập tên và email liên hệ.');return;}
+        data.bookings.unshift({id:`BK-${Date.now().toString().slice(-6)}`,room:room.id,type:room.type,guest:guestName,email:guestEmail,phone:values.guestPhone||'',checkIn:values.checkIn,checkOut:values.checkOut,guests:Number(values.guests),amount:room.price*nights+selected.reduce((sum,service)=>sum+service.price,0),status:'Chờ xác nhận',services:selected,paid:false});
+        room.status='occupied';
+        for(const service of selected)data.requests.unshift({id:`YC-${Date.now().toString().slice(-4)}`,bookingId:data.bookings[0].id,guest:guestName,room:room.id,title:service.name,detail:`Khách đặt dịch vụ ${service.name}.`,status:'Chờ tiếp nhận'});
+        save();closeModal();if(data.session){page='bookings';render();}else renderWebsite();notify('Đã gửi yêu cầu đặt phòng. Nhân viên sẽ liên hệ xác nhận.');
+      }
+    },true);
+
+    document.addEventListener('click',event=>{
+      const logoutButton=event.target.closest('[data-action="logout"]');
+      if(!logoutButton)return;
+      event.preventDefault();event.stopImmediatePropagation();
+      data.session=null;save();showLogin=false;page='dashboard';chatMessages=[];render();
+    },true);
+    const liveDateFormat=new Intl.DateTimeFormat('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    function updateLiveDetails(){
+      const now=liveDateFormat.format(new Date());
+      const siteNav=document.querySelector('.site-links');
+      const appActions=document.querySelector('.top-actions');
+      const authBox=document.querySelector('.auth-box');
+      let clock=document.querySelector('.site-live-clock');
+      if(siteNav&&!clock){clock=document.createElement('time');clock.className='site-live-clock';siteNav.prepend(clock);}
+      clock=document.querySelector('.app-live-clock');
+      if(appActions&&!clock){clock=document.createElement('time');clock.className='app-live-clock';appActions.prepend(clock);}
+      clock=document.querySelector('.auth-live-clock');
+      if(authBox&&!clock){clock=document.createElement('time');clock.className='auth-live-clock muted';clock.style.display='block';clock.style.fontSize='11px';clock.style.marginTop='15px';authBox.append(clock);}
+      for(const element of document.querySelectorAll('.site-live-clock,.app-live-clock,.auth-live-clock')){element.dateTime=new Date().toISOString();element.textContent=now;}
+      const hotlineText=`Hotline khách sạn: ${HOTEL_HOTLINE}${HOTEL_HOTLINE_IS_PLACEHOLDER?' (số demo)':''}`;
+      const footer=document.querySelector('.site-footer');
+      if(footer&&!footer.querySelector('.site-hotline')){const link=document.createElement('a');link.className='site-hotline';link.href=`tel:${HOTEL_HOTLINE.replace(/\D/g,'')}`;link.textContent=hotlineText;footer.append(link);}
+      if(authBox&&!authBox.querySelector('.auth-hotline')){const link=document.createElement('a');link.className='auth-hotline';link.href=`tel:${HOTEL_HOTLINE.replace(/\D/g,'')}`;link.textContent=hotlineText;authBox.append(link);}
+    }
+    const servicePhotos={
+      'Ẩm thực':'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=320&q=80',
+      'Di chuyển':'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=320&q=80',
+      'Wellness':'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=320&q=80',
+      'Tiện ích':'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=320&q=80',
+      'Trải nghiệm':'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=320&q=80',
+      'Khám phá':'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=320&q=80',
+      'Giải trí':'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=320&q=80'
+    };
+    const serviceImage=service=>service.image||servicePhotos[service.category]||servicePhotos['Trải nghiệm'];
+    function canReplyToReviews(){
+      if(isAdmin())return true;
+      if(data.session?.role!=='staff')return false;
+      const staff=data.users.find(user=>user.email===data.session.email);
+      return Boolean(staff?.active&&(staff.permissions||[]).includes('review-reply'));
+    }
+    function persistChanges(){
+      const savedData=JSON.stringify({...data,session:null});
+      try{
+        localStorage.setItem(STORE_KEY,savedData);
+        if(data.session)localStorage.setItem(SESSION_KEY,JSON.stringify(data.session));
+        else localStorage.removeItem(SESSION_KEY);
+        return true;
+      }catch{
+        notify('Không lưu được thay đổi. Hãy chọn ảnh nhỏ hơn hoặc giảm bớt ảnh đã tải lên.');
+        return false;
+      }
+    }
+    function compressImageFile(file){
+      return new Promise((resolve,reject)=>{
+        if(!file||!file.type.startsWith('image/')){reject(new Error('Vui lòng chọn một tệp ảnh.'));return;}
+        if(file.size>12*1024*1024){reject(new Error('Ảnh gốc phải nhỏ hơn 12 MB.'));return;}
+        const reader=new FileReader();
+        reader.onerror=()=>reject(new Error('Không đọc được tệp ảnh.'));
+        reader.onload=()=>{
+          const image=new Image();
+          image.onerror=()=>reject(new Error('Tệp ảnh không hợp lệ.'));
+          image.onload=()=>{
+            const scale=Math.min(1,1000/Math.max(image.naturalWidth,image.naturalHeight));
+            const canvas=document.createElement('canvas');
+            canvas.width=Math.max(1,Math.round(image.naturalWidth*scale));
+            canvas.height=Math.max(1,Math.round(image.naturalHeight*scale));
+            const context=canvas.getContext('2d');
+            context.fillStyle='#ffffff';context.fillRect(0,0,canvas.width,canvas.height);
+            context.drawImage(image,0,0,canvas.width,canvas.height);
+            let result=canvas.toDataURL('image/jpeg',0.76);
+            if(result.length>600000){
+              const smaller=document.createElement('canvas');
+              smaller.width=Math.max(1,Math.round(canvas.width*0.7));
+              smaller.height=Math.max(1,Math.round(canvas.height*0.7));
+              smaller.getContext('2d').drawImage(canvas,0,0,smaller.width,smaller.height);
+              result=smaller.toDataURL('image/jpeg',0.65);
+            }
+            resolve(result);
+          };
+          image.src=reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    function addImagePicker(formId,fieldName,label,currentImage,avatar=false){
+      const form=document.getElementById(formId);
+      if(!form||form.querySelector(`[data-image-field="${fieldName}"]`))return;
+      const hidden=document.createElement('input');hidden.type='hidden';hidden.name=fieldName;hidden.value=currentImage||'';hidden.dataset.imageField=fieldName;
+      const wrapper=document.createElement('div');wrapper.className='media-control';
+      const pickerLabel=document.createElement('label');pickerLabel.textContent=`${label} · chọn tệp ảnh`;
+      const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.dataset.imageUpload='true';picker.setAttribute('aria-label',label);
+      pickerLabel.append(picker);
+      const clear=document.createElement('button');clear.type='button';clear.className='media-clear';clear.dataset.clearImage=fieldName;clear.textContent='Bỏ ảnh';
+      const preview=document.createElement('img');preview.className=`media-preview${avatar?' avatar-preview':''}`;preview.alt=`Xem trước ${label}`;preview.hidden=!currentImage;
+      if(currentImage)preview.src=currentImage;
+      const help=document.createElement('small');help.className='media-help';help.textContent='Ảnh được thu nhỏ và lưu trên trình duyệt này.';
+      wrapper.append(pickerLabel,clear,preview,help,hidden);
+      const before=form.querySelector('.modal-actions')||form.lastElementChild;
+      form.insertBefore(wrapper,before);
+      picker.addEventListener('change',async()=>{
+        const file=picker.files?.[0];if(!file)return;
+        try{const image=await compressImageFile(file);hidden.value=image;preview.src=image;preview.hidden=false;}
+        catch(error){notify(error.message);picker.value='';}
+      });
+    }
+    const originalShowRoomForm=showRoomForm;
+    showRoomForm=function(room){originalShowRoomForm(room);addImagePicker('room-form','image','Ảnh phòng',room?.image||'');};
+    const originalShowServiceForm=showServiceForm;
+    showServiceForm=function(service){originalShowServiceForm(service);addImagePicker('service-form','image','Ảnh dịch vụ',service?.image||'');};
+    const originalShowStaffForm=showStaffForm;
+    showStaffForm=function(){originalShowStaffForm();addImagePicker('staff-form','avatar','Ảnh đại diện','',true);};
+    const originalRender=render;
+    render=function(){
+      originalRender();
+      if(data.session){
+        const account=data.users.find(user=>user.email===data.session.email);
+        const image=data.session.avatar||account?.avatar;
+        for(const avatar of document.querySelectorAll('.sidebar .avatar,.user-chip .avatar')){
+          if(image){avatar.innerHTML=`<img class="user-avatar-image" alt="Ảnh đại diện" src="${escapeHtml(image)}">`;avatar.classList.add('has-photo');}
+          else{avatar.textContent=data.session.name.slice(0,1);avatar.classList.remove('has-photo');}
+        }
+      }
+      if(page==='settings'&&data.session){
+        const account=data.users.find(user=>user.email===data.session.email);
+        addImagePicker('settings-form','avatar','Ảnh đại diện',data.session.avatar||account?.avatar||'',true);
+      }
+      document.querySelectorAll('.room-art img').forEach(image=>image.addEventListener('error',()=>image.remove(),{once:true}));
+    };
+    const defaultRoomPhotos=[
+      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80'
+    ];
+    const roomPhoto=room=>room.image||defaultRoomPhotos[(Number(String(room.id||'').replace(/\D/g,''))||0)%defaultRoomPhotos.length];
+    roomCard=function(room){
+      const available=room.status==='available';
+      return `<article class="room-card"><div class="room-art has-image"><img src="${escapeHtml(roomPhoto(room))}" alt="Ảnh ${escapeHtml(room.type)}" loading="lazy"><span>${escapeHtml(room.type)}</span><span class="badge ${statusClass(room.status)}">${roomStatus(room.status)}</span></div><div class="room-body"><h3>${escapeHtml(room.id)} <span class="muted">· ${escapeHtml(room.floor)}</span></h3><div class="room-meta">${escapeHtml(room.beds)} · tối đa ${room.capacity} khách<br>${escapeHtml(room.features||'')}</div><div class="room-price">${money(room.price)} <span class="muted" style="font-size:10px;font-weight:400">/ đêm</span></div><div class="room-actions">${data.session.role==='guest'?(available?`<button class="primary" data-action="book" data-room="${escapeHtml(room.id)}">Đặt phòng</button>`:'<button class="secondary" disabled>Chưa sẵn sàng</button>'):isAdmin()?`<select aria-label="Trạng thái phòng" data-room-status="${escapeHtml(room.id)}">${Object.entries({available:'Sẵn sàng',occupied:'Đang ở',cleaning:'Đang dọn',maintenance:'Bảo trì'}).map(([key,label])=>`<option value="${key}" ${room.status===key?'selected':''}>${label}</option>`).join('')} </select><button class="secondary" data-action="edit-room" data-room="${escapeHtml(room.id)}">Sửa</button>`:''}</div></div></article>`;
+    };
+    renderServices=function(){
+      return `${pageHead('Dịch vụ khách sạn','Bảng giá các tiện ích hiện có.',isAdmin()?'<button class="primary" data-action="add-service">+ Thêm dịch vụ</button>':'')}<div class="service-grid">${data.services.map(service=>`<article class="service-row"><img class="service-photo" src="${escapeHtml(serviceImage(service))}" alt="Ảnh ${escapeHtml(service.name)}" loading="lazy"><main><strong>${escapeHtml(service.name)}</strong><small>${escapeHtml(service.category)} · ${money(service.price)} ${escapeHtml(service.unit)}</small></main>${isAdmin()?`<button class="secondary" data-action="edit-service" data-name="${escapeHtml(service.name)}">Sửa</button><button class="danger" data-action="delete-service" data-name="${escapeHtml(service.name)}">Xóa</button>`:''}</article>`).join('')}</div>`;
+    };
+    renderStaff=function(){
+      if(!isAdmin())return '<section class="panel empty">Bạn không có quyền quản lý nhân viên.</section>';
+      const staff=data.users.filter(user=>user.role==='staff');
+      return `${pageHead('Nhân viên','Quản lý tài khoản và quyền xử lý đánh giá của nhân viên.','<button class="primary" data-action="add-staff">+ Thêm nhân viên</button>')}<section class="panel"><div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Email</th><th>Trả lời đánh giá</th><th>Trạng thái</th><th></th></tr></thead><tbody>${staff.map(user=>`<tr><td><div class="staff-person"><span class="staff-avatar">${user.avatar?`<img src="${escapeHtml(user.avatar)}" alt="Ảnh ${escapeHtml(user.name)}">`:escapeHtml(user.name.slice(0,1))}</span><strong>${escapeHtml(user.name)}</strong></div></td><td>${escapeHtml(user.email)}</td><td><label class="permission-check"><input type="checkbox" data-review-permission="${escapeHtml(user.email)}" ${(user.permissions||[]).includes('review-reply')?'checked':''}> Được phản hồi khách</label></td><td>${user.active?'Đang hoạt động':'Đã khóa'}</td><td><label class="file-field">Đổi ảnh<input type="file" accept="image/*" data-staff-avatar="${escapeHtml(user.email)}" aria-label="Đổi ảnh đại diện ${escapeHtml(user.name)}"></label><button class="secondary" data-action="toggle-staff" data-email="${escapeHtml(user.email)}">${user.active?'Khóa':'Mở khóa'}</button></td></tr>`).join('')}</tbody></table></div></section>`;
+    };
+    renderReviews=function(){
+      const average=data.reviews.length?(data.reviews.reduce((sum,review)=>sum+Number(review.rating||0),0)/data.reviews.length).toFixed(1):'0.0';
+      const mayReply=canReplyToReviews();
+      return `${pageHead('Đánh giá','Nhận xét từ khách lưu trú.') }<section class="panel"><div class="row"><strong style="font:500 33px Georgia,serif">${average}</strong><span class="rating">★★★★★</span><span class="muted">${data.reviews.length} đánh giá</span></div></section><div class="service-grid">${data.reviews.map((review,index)=>`<article class="panel"><div class="panel-head"><strong>${escapeHtml(review.guest)}</strong><span class="rating">${'★'.repeat(review.rating)}${'☆'.repeat(5-review.rating)}</span></div><p style="font-size:12px;line-height:1.7;color:var(--muted)">${escapeHtml(review.comment)}</p>${review.response?`<div class="review-reply"><strong>Phản hồi từ Lumière${review.responseBy?` · ${escapeHtml(review.responseBy)}`:''}</strong>${escapeHtml(review.response)}</div>`:''}${mayReply?`<form class="review-reply-form" data-review-index="${index}"><textarea name="response" maxlength="500" required placeholder="Viết phản hồi cho khách...">${escapeHtml(review.response||'')}</textarea><button class="primary">${review.response?'Cập nhật phản hồi':'Gửi phản hồi'}</button></form>`:''}</article>`).join('')}</div>`;
+    };
+    const originalNavItems=navItems;
+    navItems=function(){const items=originalNavItems();if(data.session?.role==='staff'&&canReplyToReviews()&&!items.some(item=>item[0]==='reviews'))items.push(['reviews','☆','Đánh giá']);return items;};
+    const originalRenderSettings=renderSettings;
+    renderSettings=function(){return originalRenderSettings();};
+    const originalShowRoomFormWithImage=showRoomForm;
+    const originalShowServiceFormWithImage=showServiceForm;
+    const originalShowStaffFormWithImage=showStaffForm;
+    function readFormValues(form){return Object.fromEntries(new FormData(form).entries());}
+    function commitRoomForm(values){
+      const oldId=values.originalId;const oldRoom=data.rooms.find(room=>room.id===oldId);
+      const room={id:values.id.trim(),type:values.type.trim(),floor:values.floor.trim(),price:Number(values.price),capacity:Number(values.capacity),beds:values.beds.trim(),features:values.features.trim(),image:values.image||'',status:oldRoom?.status||'available'};
+      if(!oldId&&data.rooms.some(item=>item.id===room.id)){notify('Mã phòng đã tồn tại.');return;}
+      data.rooms=oldId?data.rooms.map(item=>item.id===oldId?room:item):[...data.rooms,room];
+      persistChanges();closeModal();render();notify('Đã lưu thông tin phòng và ảnh.');
+    }
+    function commitServiceForm(values){
+      const previous=data.services.find(service=>service.name===values.originalName);
+      const service={name:values.name.trim(),category:values.category.trim(),price:Number(values.price),unit:values.unit.trim(),icon:previous?.icon||'✦',image:values.image||''};
+      data.services=values.originalName?data.services.map(item=>item.name===values.originalName?service:item):[...data.services,service];
+      persistChanges();closeModal();render();notify('Đã lưu dịch vụ và ảnh.');
+    }
+    function commitProfileForm(values){
+      data.session={...data.session,name:values.name.trim(),phone:values.phone.trim(),avatar:values.avatar||''};
+      const user=data.users.find(item=>item.email===data.session.email);
+      if(user)Object.assign(user,{name:data.session.name,phone:data.session.phone,avatar:data.session.avatar});
+      persistChanges();render();notify('Đã lưu hồ sơ và ảnh đại diện.');
+    }
+    function commitStaffForm(values){
+      if(data.users.some(user=>user.email.toLowerCase()===values.email.toLowerCase())){notify('Email đã tồn tại.');return;}
+      data.users.push({name:values.name.trim(),email:values.email.trim(),password:values.password,role:'staff',active:true,phone:'',avatar:values.avatar||'',permissions:[]});
+      persistChanges();closeModal();render();notify('Đã tạo tài khoản nhân viên.');
+    }
+    function bindMediaForm(formId,saveHandler){
+      const form=document.getElementById(formId);if(!form)return;
+      const button=form.querySelector('.modal-actions .primary')||form.querySelector('button.primary');
+      if(!button||button.dataset.mediaSaveBound)return;
+      button.dataset.mediaSaveBound='true';button.type='button';
+      button.addEventListener('click',async()=>{
+        if(!form.reportValidity())return;
+        const file=form.querySelector('input[type="file"][data-image-upload]')?.files?.[0];
+        const imageField=form.querySelector('input[type="hidden"][data-image-field]');
+        if(file&&imageField){try{imageField.value=await compressImageFile(file);}catch(error){notify(error.message);return;}}
+        saveHandler(readFormValues(form));
+      });
+    }
+    window.addEventListener('submit',async event=>{
+      const form=event.target;
+      if(!['room-form','service-form','settings-form','staff-form'].includes(form.id))return;
+      event.preventDefault();event.stopImmediatePropagation();
+      const values=readFormValues(form);
+      const file=form.querySelector('input[type="file"][data-image-upload]')?.files?.[0];
+      const imageField=form.querySelector('input[type="hidden"][data-image-field]');
+      if(file){
+        try{values[imageField?.name||'image']=await compressImageFile(file);}
+        catch(error){notify(error.message);return;}
+      }else if(imageField){values[imageField.name]=imageField.value;}
+      if(form.id==='room-form')commitRoomForm(values);
+      else if(form.id==='service-form')commitServiceForm(values);
+      else if(form.id==='settings-form')commitProfileForm(values);
+      else commitStaffForm(values);
+    },true);
+    window.addEventListener('submit',event=>{
+      const form=event.target;
+      if(!form.matches('.review-reply-form'))return;
+      event.preventDefault();event.stopImmediatePropagation();
+      if(!canReplyToReviews()){notify('Tài khoản chưa được cấp quyền phản hồi đánh giá.');return;}
+      const review=data.reviews[Number(form.dataset.reviewIndex)];const response=new FormData(form).get('response')?.toString().trim();
+      if(!review||!response)return;
+      review.response=response;review.responseBy=data.session.name;review.responseAt=new Date().toISOString();
+      persistChanges();render();notify('Đã lưu phản hồi đánh giá.');
+    },true);
+    document.addEventListener('change',async event=>{
+      const input=event.target;
+      if(input.matches('[data-review-permission]')){
+        const user=data.users.find(item=>item.email===input.dataset.reviewPermission);
+        if(!user)return;
+        user.permissions=Array.isArray(user.permissions)?user.permissions:[];
+        user.permissions=input.checked?[...new Set([...user.permissions,'review-reply'])]:user.permissions.filter(permission=>permission!=='review-reply');
+        persistChanges();render();notify(input.checked?'Đã cấp quyền phản hồi đánh giá.':'Đã thu hồi quyền phản hồi đánh giá.');
+      }
+      if(input.matches('[data-staff-avatar]')&&input.files?.[0]){
+        const user=data.users.find(item=>item.email===input.dataset.staffAvatar);if(!user)return;
+        try{user.avatar=await compressImageFile(input.files[0]);persistChanges();render();notify('Đã lưu ảnh đại diện nhân viên.');}
+        catch(error){notify(error.message);}
+      }
+    },true);
+    document.addEventListener('click',event=>{
+      const clear=event.target.closest('[data-clear-image]');if(!clear)return;
+      const form=clear.closest('form');const field=form?.querySelector(`[data-image-field="${clear.dataset.clearImage}"]`);const preview=form?.querySelector('.media-preview');
+      if(field)field.value='';if(preview){preview.removeAttribute('src');preview.hidden=true;}
+    },true);
+    const originalRenderForMedia=render;
+    render=function(){
+      originalRenderForMedia();
+      if(data.session){
+        const account=data.users.find(user=>user.email===data.session.email);const avatar=data.session.avatar||account?.avatar;
+        for(const element of document.querySelectorAll('.sidebar .avatar,.user-chip .avatar')){
+          if(avatar)element.innerHTML=`<img class="user-avatar-image" src="${escapeHtml(avatar)}" alt="Ảnh đại diện">`;
+          else element.textContent=data.session.name.slice(0,1);
+        }
+      }
+      if(page==='settings'&&data.session){addImagePicker('settings-form','avatar','Ảnh đại diện',data.session.avatar||data.users.find(user=>user.email===data.session.email)?.avatar||'',true);bindMediaForm('settings-form',commitProfileForm);}
+      document.querySelectorAll('.room-art img').forEach(image=>image.addEventListener('error',()=>image.remove(),{once:true}));
+      document.querySelectorAll('.service-photo').forEach(image=>image.addEventListener('error',()=>{image.style.display='none';},{once:true}));
+    };
+    const attachRoomImageForm=showRoomForm;showRoomForm=function(room){attachRoomImageForm(room);addImagePicker('room-form','image','Ảnh phòng',room?.image||'');bindMediaForm('room-form',commitRoomForm);};
+    const attachServiceImageForm=showServiceForm;showServiceForm=function(service){attachServiceImageForm(service);addImagePicker('service-form','image','Ảnh dịch vụ',service?.image||'');bindMediaForm('service-form',commitServiceForm);};
+    const attachStaffImageForm=showStaffForm;showStaffForm=function(){attachStaffImageForm();addImagePicker('staff-form','avatar','Ảnh đại diện nhân viên','',true);bindMediaForm('staff-form',commitStaffForm);};
+    const attachSettingsImageForm=renderSettings;renderSettings=function(){return attachSettingsImageForm();};
+    const staffAccessOptions=[
+      {key:'rooms',label:'Phòng'},
+      {key:'bookings',label:'Đặt phòng'},
+      {key:'services',label:'Dịch vụ'},
+      {key:'operations',label:'Vận hành'},
+      {key:'reports',label:'Báo cáo doanh thu'},
+      {key:'invoice-notifications',label:'Nhận hóa đơn'},
+      {key:'review-reply',label:'Trả lời đánh giá'}
+    ];
+    const staffPagePermission={rooms:'rooms',bookings:'bookings',services:'services',operations:'operations',invoices:'invoice-notifications',reports:'reports',reviews:'review-reply'};
+    function permissionsForStaff(user){return Array.isArray(user?.permissions)?user.permissions:[];}
+    function staffCanOpen(pageId){
+      if(data.session?.role!=='staff')return true;
+      if(pageId==='dashboard'||pageId==='settings')return true;
+      const permission=staffPagePermission[pageId];
+      const user=data.users.find(item=>item.email===data.session.email);
+      return Boolean(permission&&user?.active&&permissionsForStaff(user).includes(permission));
+    }
+    const navItemsBeforePermissions=navItems;
+    navItems=function(){
+      const items=navItemsBeforePermissions();
+      if(data.session?.role==='admin'&&!items.some(([id])=>id==='invoices')){
+        const reportsIndex=items.findIndex(([id])=>id==='reports');
+        items.splice(reportsIndex<0?items.length:reportsIndex,0,['invoices','▧','Hóa đơn']);
+        return items;
+      }
+      if(data.session?.role!=='staff')return items;
+      const visible=items.filter(([id])=>staffCanOpen(id));
+      if(staffCanOpen('reports')&&!visible.some(([id])=>id==='reports')){
+        const settingsIndex=visible.findIndex(([id])=>id==='settings');
+        visible.splice(settingsIndex<0?visible.length:settingsIndex,0,['reports','↗','Doanh thu']);
+      }
+      if(staffCanOpen('invoices')&&!visible.some(([id])=>id==='invoices')){
+        const settingsIndex=visible.findIndex(([id])=>id==='settings');
+        visible.splice(settingsIndex<0?visible.length:settingsIndex,0,['invoices','▧','Hóa đơn']);
+      }
+      return visible;
+    };
+    renderStaff=function(){
+      if(!isAdmin())return '<section class="panel empty">Bạn không có quyền quản lý nhân viên.</section>';
+      const staff=data.users.filter(user=>user.role==='staff');
+      return `${pageHead('Nhân viên','Cấp quyền theo khu vực và thao tác của từng tài khoản.','<button class="primary" data-action="add-staff">+ Thêm nhân viên</button>')}<section class="panel staff-table"><div class="table-wrap"><table><thead><tr><th>Nhân viên</th><th>Email</th><th>Quyền truy cập</th><th>Trạng thái</th><th></th></tr></thead><tbody>${staff.map(user=>`<tr><td><div class="staff-person"><span class="staff-avatar">${user.avatar?`<img src="${escapeHtml(user.avatar)}" alt="Ảnh ${escapeHtml(user.name)}">`:escapeHtml(user.name.slice(0,1))}</span><strong>${escapeHtml(user.name)}</strong></div></td><td>${escapeHtml(user.email)}</td><td><div class="permission-panel"><strong>Chọn quyền</strong><div class="permission-grid">${staffAccessOptions.map(option=>`<label class="permission-check"><input type="checkbox" data-staff-permission="${escapeHtml(user.email)}" data-permission-key="${option.key}" ${permissionsForStaff(user).includes(option.key)?'checked':''}>${option.label}</label>`).join('')}</div></div></td><td><span class="badge ${user.active?'':'bad'}">${user.active?'Đang hoạt động':'Đã khóa'}</span></td><td><div class="stack"><label class="file-field">Đổi ảnh<input type="file" accept="image/*" data-staff-avatar="${escapeHtml(user.email)}" aria-label="Đổi ảnh đại diện ${escapeHtml(user.name)}"></label><button class="secondary" data-action="toggle-staff" data-email="${escapeHtml(user.email)}">${user.active?'Khóa tài khoản':'Mở khóa'}</button></div></td></tr>`).join('')}</tbody></table></div></section>`;
+    };
+    const reportsForAdmin=renderReports;
+    renderReports=function(){
+      if(isAdmin())return reportsForAdmin();
+      if(!staffCanOpen('reports'))return '<section class="panel empty">Tài khoản chưa được cấp quyền xem báo cáo.</section>';
+      const total=data.bookings.reduce((sum,booking)=>sum+Number(booking.amount||0),0);
+      const paid=data.bookings.filter(booking=>booking.paid).reduce((sum,booking)=>sum+Number(booking.amount||0),0);
+      return `${pageHead('Báo cáo doanh thu','Chế độ xem theo quyền nhân viên được cấp.')}<div class="stats"><article class="stat"><small>Tổng giá trị đặt phòng</small><strong>${money(total)}</strong><span>${data.bookings.length} lượt đặt</span></article><article class="stat"><small>Đã thanh toán</small><strong>${money(paid)}</strong><span>theo dữ liệu demo</span></article><article class="stat"><small>Còn phải thu</small><strong>${money(total-paid)}</strong><span>theo dữ liệu demo</span></article></div>`;
+    };
+    const bookingsForAll=renderBookings;
+    renderBookings=function(){
+      if(data.session?.role!=='staff')return bookingsForAll();
+      if(!staffCanOpen('bookings'))return '<section class="panel empty">Tài khoản chưa được cấp quyền xem đặt phòng.</section>';
+      return `${pageHead('Đặt phòng','Danh sách chỉ xem theo quyền nhân viên được cấp.')}${data.bookings.length?data.bookings.map(booking=>bookingCard(booking,false)).join(''):'<section class="panel empty">Chưa có lượt đặt phòng.</section>'}`;
+    };
+    function renderGuestDashboard(){
+      const available=data.rooms.filter(room=>room.status==='available');
+      const services=data.services.slice(0,6);
+      return `<section class="guest-welcome"><div><span class="eyebrow">Lumière Hotel</span><h1>Chào mừng ${escapeHtml(data.session.name.split(' ').slice(-1)[0])}</h1><p>Khám phá những căn phòng đang sẵn sàng và các dịch vụ được chuẩn bị cho kỳ nghỉ của bạn tại Lumière.</p><div class="guest-welcome-actions"><button class="primary" data-page="rooms">Xem phòng còn trống</button><button class="secondary" data-page="services">Khám phá dịch vụ</button></div></div><div class="guest-welcome-photo"></div></section><section class="guest-section"><div class="guest-section-head"><div><h2>Phòng đang sẵn sàng</h2><p>${available.length} phòng còn trống để bạn lựa chọn.</p></div><button class="text-button" data-page="rooms">Xem tất cả</button></div><div class="guest-room-grid">${available.slice(0,3).map(roomCard).join('')}</div></section><section class="guest-section"><div class="guest-section-head"><div><h2>Dịch vụ cho kỳ nghỉ</h2><p>Những tiện ích nhỏ giúp thời gian lưu trú nhẹ nhàng hơn.</p></div><button class="text-button" data-page="services">Xem tất cả</button></div><div class="guest-service-list">${services.map(service=>`<article class="service-row"><span class="service-icon">${escapeHtml(service.icon||'✦')}</span><main><strong>${escapeHtml(service.name)}</strong><small>${escapeHtml(service.category)} · ${money(service.price)} ${escapeHtml(service.unit)}</small></main></article>`).join('')}</div></section>`;
+    }
+    const dashboardWithoutHero=renderDashboard;
+    renderDashboard=function(){
+      if(data.session?.role==='guest')return renderGuestDashboard();
+      if(!isAdmin())return dashboardWithoutHero();
+      const ready=data.rooms.filter(room=>room.status==='available').length;
+      const upcoming=data.bookings.find(booking=>!['Đã hủy','Đã trả phòng'].includes(booking.status));
+      const dashboardContent=document.createElement('div');
+      dashboardContent.innerHTML=dashboardWithoutHero();
+      dashboardContent.querySelector('.page-head')?.remove();
+      return `<section class="dashboard-welcome"><div class="dashboard-welcome-copy"><span class="eyebrow">Không gian điều hành Lumière</span><h1>Chào ${escapeHtml(data.session.name.split(' ').slice(-1)[0])}, chúc bạn một ngày thuận lợi.</h1><p>Toàn bộ hoạt động lưu trú được sắp xếp tại một nơi, để đội ngũ chăm chút từng trải nghiệm của khách.</p><div class="dashboard-welcome-actions"><button class="primary" data-page="rooms">Quản lý phòng</button><button class="secondary" data-page="bookings">Xem đặt phòng</button></div></div><div class="dashboard-welcome-photo"><img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1100&q=85" alt="Khu nghỉ dưỡng Lumière Hotel"><div class="dashboard-welcome-count"><strong>${ready} phòng</strong><small>sẵn sàng đón khách</small></div></div></section>${dashboardContent.innerHTML}`;
+    };
+    const roomsForRole=renderRooms;
+    renderRooms=function(){
+      if(data.session?.role!=='guest')return roomsForRole();
+      const available=data.rooms.filter(room=>room.status==='available');
+      const query=roomSearch.toLocaleLowerCase('vi');
+      const rooms=available.filter(room=>`${room.id} ${room.type} ${room.floor}`.toLocaleLowerCase('vi').includes(query));
+      return `${pageHead('Phòng còn trống','Những lựa chọn đang sẵn sàng cho kỳ nghỉ của bạn.')}<div class="toolbar"><input id="room-search" value="${escapeHtml(roomSearch)}" placeholder="Tìm theo mã hoặc loại phòng"></div><div class="room-grid" id="room-grid">${rooms.length?rooms.map(roomCard).join(''):'<div class="empty">Không tìm thấy phòng còn trống phù hợp.</div>'}</div>`;
+    };
+    const renderForPermission=render;
+    render=function(){
+      if(data.session?.role==='staff'&&!staffCanOpen(page))page='dashboard';
+      return renderForPermission();
+    };
+    document.addEventListener('change',event=>{
+      const input=event.target.closest('[data-staff-permission]');
+      if(!input)return;
+      const user=data.users.find(item=>item.email===input.dataset.staffPermission);
+      if(!user)return;
+      const permission=input.dataset.permissionKey;
+      user.permissions=permissionsForStaff(user);
+      user.permissions=input.checked?[...new Set([...user.permissions,permission])]:user.permissions.filter(item=>item!==permission);
+      persistChanges();render();notify(input.checked?'Đã cấp quyền cho nhân viên.':'Đã thu hồi quyền của nhân viên.');
+    },true);
+    function bookingServiceAmount(service){
+      if(service.lineTotal!=null)return Number(service.lineTotal)||0;
+      return (Number(service.price)||0)*Math.max(1,Number(service.quantity)||1);
+    }
+    function invoiceRecipients(){
+      return [...new Set(data.users.filter(user=>user.active&&(user.role==='admin'||(user.role==='staff'&&permissionsForStaff(user).includes('invoice-notifications')))).map(user=>user.email))];
+    }
+    function issueInvoice(booking){
+      if(booking.invoice)return booking.invoice;
+      const room=data.rooms.find(item=>item.id===booking.room);
+      const nights=Math.max(1,Math.round((new Date(booking.checkOut)-new Date(booking.checkIn))/86400000)||1);
+      const services=(booking.services||[]).map(service=>({...service,lineTotal:bookingServiceAmount(service)}));
+      const serviceTotal=services.reduce((sum,service)=>sum+service.lineTotal,0);
+      const gross=Number(booking.amount)||((room?.price||0)*nights+serviceTotal);
+      const roomTotal=Math.max(0,gross-serviceTotal);
+      const recipients=invoiceRecipients();
+      const invoice={
+        number:`HD-${String(booking.id).replace(/[^0-9]/g,'').slice(-6)||Date.now().toString().slice(-6)}`,
+        bookingId:booking.id,guest:booking.guest,email:booking.email,room:booking.room,roomType:booking.type,
+        nights,checkIn:booking.checkIn,checkOut:booking.checkOut,roomTotal,serviceTotal,total:roomTotal+serviceTotal,
+        services,paid:Boolean(booking.paid),issuedAt:new Date().toISOString(),recipients
+      };
+      booking.invoice=invoice;booking.status='Đã trả phòng';booking.checkedOutAt=invoice.issuedAt;
+      if(room){room.status='cleaning';room.guest='';room.nights=0;}
+      if(!data.requests.some(request=>request.bookingId===booking.id&&request.title==='Dọn phòng sau khi trả phòng')){
+        data.requests.unshift({id:`YC-${Date.now().toString().slice(-4)}`,bookingId:booking.id,guest:booking.guest,room:booking.room,title:'Dọn phòng sau khi trả phòng',detail:'Khách đã trả phòng và hóa đơn đã phát hành; vui lòng kiểm tra phòng.',status:'Chờ tiếp nhận',type:'housekeeping'});
+      }
+      data.invoiceNotifications=data.invoiceNotifications||[];
+      data.invoiceNotifications.unshift({id:invoice.number,bookingId:booking.id,recipients,issuedAt:invoice.issuedAt,readBy:[]});
+      persistChanges();return invoice;
+    }
+    function invoiceMarkup(invoice){
+      const serviceRows=(invoice.services||[]).map(service=>`<div class="invoice-line"><span>${escapeHtml(service.name)}${Number(service.quantity)>1?` × ${Number(service.quantity)}`:''}</span><strong>${money(service.lineTotal??bookingServiceAmount(service))}</strong></div>`).join('');
+      const dateText=new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(invoice.issuedAt));
+      return `<article class="invoice-paper"><header class="invoice-brand"><div><h3>LUMIÈRE HOTEL</h3><small>HÓA ĐƠN LƯU TRÚ</small></div><div style="text-align:right"><strong>${escapeHtml(invoice.number)}</strong><br><small>${dateText}</small></div></header><div class="metric-list" style="padding:14px 0"><div class="metric-line"><span>Khách hàng</span><strong>${escapeHtml(invoice.guest)}</strong></div><div class="metric-line"><span>Phòng</span><strong>${escapeHtml(invoice.roomType)} · ${escapeHtml(invoice.room)}</strong></div><div class="metric-line"><span>Thời gian lưu trú</span><strong>${escapeHtml(invoice.checkIn)} → ${escapeHtml(invoice.checkOut)} · ${invoice.nights} đêm</strong></div></div><div class="invoice-lines"><div class="invoice-line"><span>Tiền phòng (${invoice.nights} đêm)</span><strong>${money(invoice.roomTotal)}</strong></div>${serviceRows||'<div class="invoice-line"><span>Dịch vụ</span><span>Không phát sinh</span></div>'}</div><div class="invoice-total"><span>Tổng thanh toán</span><strong>${money(invoice.total)}</strong></div><p class="invoice-note">${isAdmin()||invoice.recipients?.includes(data.session?.email)?'Hóa đơn đã được gửi đến khu Hóa đơn của quản trị viên và nhân viên được phân quyền.':'Hóa đơn điện tử của kỳ lưu trú Lumière Hotel.'}</p><div class="invoice-actions"><button type="button" class="secondary" data-action="print-invoice">In / Lưu PDF</button><button type="button" class="primary" data-action="close-modal">Đóng</button></div></article>`;
+    }
+    function showInvoice(booking){if(!booking?.invoice)return;openModal('Hóa đơn lưu trú',invoiceMarkup(booking.invoice));}
+    function issueInvoiceAndShow(booking){
+      if(!booking)return;
+      if(booking.status==='Đã hủy'){notify('Không thể xuất hóa đơn cho lượt đặt đã hủy.');return;}
+      const invoice=issueInvoice(booking);render();showInvoice({...booking,invoice});notify(`Đã phát hành ${invoice.number} và chuyển đến người nhận được phân quyền.`);
+    }
+    const originalBookingCardWithInvoice=bookingCard;
+    bookingCard=function(booking,actions=true){
+      let html=originalBookingCardWithInvoice(booking,actions);
+      if(!actions||!data.session)return html;
+      const buttons=[];
+      if(data.session.role==='guest'&&booking.email===data.session.email&&booking.status==='Đang ở')buttons.push(`<button class="primary" data-action="guest-checkout" data-id="${escapeHtml(booking.id)}">Trả phòng & lấy hóa đơn</button>`);
+      if(booking.invoice&&(isAdmin()||booking.email===data.session.email))buttons.push(`<button class="secondary" data-action="view-invoice" data-id="${escapeHtml(booking.id)}">Xem hóa đơn</button>`);
+      return buttons.length?html.replace(/<\/article>$/,`<div class="booking-actions">${buttons.join('')}</div></article>`):html;
+    };
+    renderServices=function(){
+      const canOrder=data.session?.role==='guest';
+      return `${pageHead('Dịch vụ khách sạn','Chọn tiện ích cho kỳ lưu trú của bạn.',isAdmin()?'<button class="primary" data-action="add-service">+ Thêm dịch vụ</button>':'')}<div class="service-grid">${data.services.map(service=>`<article class="service-row"><img class="service-photo" src="${escapeHtml(serviceImage(service))}" alt="Ảnh ${escapeHtml(service.name)}" loading="lazy"><main><strong>${escapeHtml(service.name)}</strong><small>${escapeHtml(service.category)} · ${money(service.price)} ${escapeHtml(service.unit)}</small>${canOrder?`<button class="primary service-order-button" data-action="order-service" data-name="${escapeHtml(service.name)}">Đặt dịch vụ</button>`:''}</main>${isAdmin()?`<button class="secondary" data-action="edit-service" data-name="${escapeHtml(service.name)}">Sửa</button><button class="danger" data-action="delete-service" data-name="${escapeHtml(service.name)}">Xóa</button>`:''}</article>`).join('')}</div>`;
+    };
+    function activeGuestBookings(){return data.bookings.filter(booking=>booking.email===data.session?.email&&['Chờ xác nhận','Đã xác nhận','Đang ở'].includes(booking.status));}
+    function beginServiceOrder(serviceName){
+      const service=data.services.find(item=>item.name===serviceName);if(!service)return;
+      const stays=activeGuestBookings();
+      if(!stays.length){notify('Bạn cần có lượt đặt phòng đang hoạt động để đặt dịch vụ.');page='rooms';render();return;}
+      openModal('Đặt dịch vụ',`<form id="service-order-form"><div class="notice" style="margin-bottom:14px">${escapeHtml(service.name)} · ${money(service.price)} ${escapeHtml(service.unit)}</div><div class="stack"><label class="field">Gắn với kỳ lưu trú<select name="bookingId" required>${stays.map(booking=>`<option value="${escapeHtml(booking.id)}">${escapeHtml(booking.id)} · ${escapeHtml(booking.type)} · ${escapeHtml(booking.status)}</option>`).join('')}</select></label><label class="field">Số lượng<input name="quantity" type="number" min="1" max="20" value="1" required></label><label class="field">Ghi chú<textarea name="notes" maxlength="300" placeholder="Thời gian mong muốn hoặc yêu cầu thêm"></textarea></label></div><div class="modal-actions"><button type="button" class="secondary" data-action="close-modal">Hủy</button><button class="primary">Gửi yêu cầu dịch vụ</button></div></form>`);
+      document.getElementById('service-order-form').dataset.serviceName=service.name;
+    }
+    renderInvoices=function(){
+      const bookings=data.bookings.filter(booking=>booking.invoice&&(isAdmin()||booking.invoice.recipients?.includes(data.session?.email)));
+      return `${pageHead('Hóa đơn','Hóa đơn trả phòng gửi cho quản trị viên và nhân viên được phân quyền.')}${bookings.length?`<div class="stack">${bookings.map(booking=>`<article class="invoice-card"><div class="row space"><div><span class="eyebrow">${escapeHtml(booking.invoice.number)}</span><h2 style="margin:5px 0">${escapeHtml(booking.guest)} · ${escapeHtml(booking.room)}</h2><span class="muted">${escapeHtml(booking.checkIn)} → ${escapeHtml(booking.checkOut)} · ${booking.invoice.nights} đêm</span></div><strong>${money(booking.invoice.total)}</strong></div><div class="row space" style="margin-top:13px"><span class="badge ${booking.invoice.paid?'':'warn'}">${booking.invoice.paid?'Đã thanh toán':'Chờ thanh toán'}</span><div class="row">${isAdmin()?`<label class="check-row"><input type="checkbox" data-invoice-paid="${escapeHtml(booking.id)}" ${booking.invoice.paid?'checked':''}> Đã thanh toán</label>`:''}<button class="secondary" data-action="view-invoice" data-id="${escapeHtml(booking.id)}">Mở hóa đơn</button></div></div><small class="invoice-recipient">Đã phát hành ${new Intl.DateTimeFormat('vi-VN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(booking.invoice.issuedAt))}</small></article>`).join('')}</div>`:'<section class="panel empty">Chưa có hóa đơn đã phát hành cho tài khoản này.</section>'}`;
+    };
+    function renderInvoices(){
+      if(!isAdmin()&&!staffCanOpen('invoices'))return '<section class="panel empty">Tài khoản chưa được cấp quyền nhận hóa đơn.</section>';
+      const bookings=data.bookings.filter(booking=>booking.invoice&&(isAdmin()||booking.invoice.recipients?.includes(data.session?.email)));
+      if(!bookings.length)return `${pageHead('Hóa đơn','Hóa đơn trả phòng được chuyển tới admin và nhân viên có quyền nhận.') }<section class="panel empty">Chưa có hóa đơn đã phát hành.</section>`;
+      return `${pageHead('Hóa đơn','Hóa đơn trả phòng được chuyển tới admin và nhân viên có quyền nhận.')}<div class="stack">${bookings.map(booking=>`<article class="invoice-card"><div class="row space"><div><span class="eyebrow">${escapeHtml(booking.invoice.number)}</span><h2 style="margin:5px 0">${escapeHtml(booking.guest)} · ${escapeHtml(booking.room)}</h2><span class="muted">${escapeHtml(booking.checkIn)} → ${escapeHtml(booking.checkOut)} · ${booking.invoice.nights} đêm</span></div><strong>${money(booking.invoice.total)}</strong></div><div class="row space" style="margin-top:14px"><span class="badge ${booking.invoice.paid?'':'warn'}">${booking.invoice.paid?'Đã thanh toán':'Chờ thanh toán'}</span><div class="row">${isAdmin()?`<label class="check-row"><input type="checkbox" data-invoice-paid="${escapeHtml(booking.id)}" ${booking.invoice.paid?'checked':''}> Đã thanh toán</label>`:''}<button class="secondary" data-action="view-invoice" data-id="${escapeHtml(booking.id)}">Mở hóa đơn</button></div></div><small class="invoice-recipient">Phát hành ${new Intl.DateTimeFormat('vi-VN',{dateStyle:'medium',timeStyle:'short'}).format(new Date(booking.invoice.issuedAt))}</small></article>`).join('')}</div>`;
+    }
+    const pageRendererBeforeInvoices=renderPage;
+    renderPage=function(){return page==='invoices'?renderInvoices():pageRendererBeforeInvoices();};
+    function handleCheckout(booking){
+      if(!booking)return;
+      if(data.session?.role==='guest'&&booking.email!==data.session.email){notify('Bạn chỉ có thể trả phòng cho kỳ lưu trú của mình.');return;}
+      if(booking.status!=='Đang ở'){notify('Chỉ có thể trả phòng khi trạng thái lưu trú là Đang ở.');return;}
+      issueInvoiceAndShow(booking);
+    }
+    function submitServiceOrder(form){
+      const values=Object.fromEntries(new FormData(form).entries());
+      const service=data.services.find(item=>item.name===form.dataset.serviceName);
+      const booking=data.bookings.find(item=>item.id===values.bookingId&&item.email===data.session?.email);
+      const quantity=Math.max(1,Number(values.quantity)||1);
+      if(!service||!booking||!activeGuestBookings().some(item=>item.id===booking.id)){notify('Không tìm thấy kỳ lưu trú đang hoạt động cho yêu cầu này.');return;}
+      const id=`DV-${Date.now().toString().slice(-7)}`;const total=Number(service.price)*quantity;
+      const order={id,bookingId:booking.id,room:booking.room,guest:data.session.name,email:data.session.email,name:service.name,category:service.category,unitPrice:Number(service.price),quantity,total,notes:String(values.notes||'').trim(),status:'Chờ tiếp nhận',createdAt:new Date().toISOString()};
+      data.serviceOrders=data.serviceOrders||[];data.serviceOrders.unshift(order);
+      booking.services=Array.isArray(booking.services)?booking.services:[];
+      booking.services.push({name:service.name,price:total,unitPrice:Number(service.price),quantity,unit:service.unit,lineTotal:total,serviceOrderId:id});
+      booking.amount=(Number(booking.amount)||0)+total;
+      data.requests.unshift({id,bookingId:booking.id,guest:data.session.name,room:booking.room,title:`${service.name} × ${quantity}`,detail:`${values.notes?`Ghi chú: ${String(values.notes).trim()}`:'Khách đặt thêm dịch vụ trong kỳ lưu trú.'}`,status:'Chờ tiếp nhận',type:'service'});
+      persistChanges();closeModal();page='services';render();notify('Đã gửi yêu cầu dịch vụ; chi phí sẽ được cộng vào hóa đơn trả phòng.');
+    }
+    window.addEventListener('click',event=>{
+      const target=event.target.closest('[data-action]');if(!target)return;
+      if(target.dataset.action==='guest-checkout'||target.dataset.action==='checkout'){
+        event.preventDefault();event.stopImmediatePropagation();
+        handleCheckout(data.bookings.find(booking=>booking.id===target.dataset.id));return;
+      }
+      if(target.dataset.action==='view-invoice'){
+        event.preventDefault();event.stopImmediatePropagation();
+        const booking=data.bookings.find(item=>item.id===target.dataset.id);
+        if(booking&&(isAdmin()||booking.email===data.session?.email||booking.invoice?.recipients?.includes(data.session?.email)))showInvoice(booking);
+        return;
+      }
+      if(target.dataset.action==='print-invoice'){event.preventDefault();event.stopImmediatePropagation();window.print();return;}
+      if(target.dataset.action==='order-service'){event.preventDefault();event.stopImmediatePropagation();beginServiceOrder(target.dataset.name);}
+    },true);
+    window.addEventListener('change',event=>{
+      const target=event.target;
+      if(target.matches('[data-booking-status]')&&target.value==='Đã trả phòng'){
+        event.preventDefault();event.stopImmediatePropagation();handleCheckout(data.bookings.find(booking=>booking.id===target.dataset.bookingStatus));return;
+      }
+      if(target.matches('[data-invoice-paid]')){
+        event.preventDefault();event.stopImmediatePropagation();
+        const booking=data.bookings.find(item=>item.id===target.dataset.invoicePaid);
+        if(booking?.invoice){booking.invoice.paid=target.checked;booking.paid=target.checked;persistChanges();render();notify(target.checked?'Đã ghi nhận thanh toán hóa đơn.':'Hóa đơn đã chuyển về chờ thanh toán.');}
+      }
+    },true);
+    window.addEventListener('submit',event=>{
+      const form=event.target;if(form.id!=='service-order-form')return;
+      event.preventDefault();event.stopImmediatePropagation();
+      if(data.session?.role!=='guest'){notify('Chỉ tài khoản khách hàng mới có thể đặt dịch vụ.');return;}
+      if(!form.reportValidity())return;
+      submitServiceOrder(form);
+    },true);
+    // Luôn mở website công khai khi truy cập lại hệ thống; đăng nhập chỉ bắt đầu từ nút trên website.
+    data.session=null;
+    localStorage.removeItem(SESSION_KEY);
+    showLogin=false;
+    page='dashboard';
+    render();
+    updateLiveDetails();
+    setInterval(updateLiveDetails,1000);
+  </script>
+</body>
+</html>
