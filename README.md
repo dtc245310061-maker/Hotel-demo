@@ -18,8 +18,10 @@ Mở `http://127.0.0.1:8000/`. Kiểm tra trạng thái Django tại `http://127
 | Vai trò | Tên | Email | Mật khẩu |
 |---|---|---|---|
 | Quản trị viên | Lê Thu Thùy | `admin@lumiere.vn` | `admin123` |
-| Nhân viên | Nguyễn Trần Tuấn Anh | `nhanvien@lumiere.vn` | `Abc12345` |
+| Nhân viên chính | Nguyễn Tuấn Anh | `nhanvien@lumiere.vn` | `Abc12345` |
 | Khách hàng | Nguyễn Minh Anh | `guest@lumiere.vn` | `guest123` |
+
+Lưu ý: các nhân viên ảo demo không cần tài khoản đăng nhập. Chúng chỉ xuất hiện trong danh sách quản lý nhân viên và có thể được admin cấp quyền truy cập trong mục nhân viên.
 
 Các tài khoản trên chỉ dùng để trình diễn local; không dùng lại mật khẩu này cho dịch vụ thật.
 
