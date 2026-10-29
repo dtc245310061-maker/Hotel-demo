@@ -4,17 +4,19 @@
 
 ## Chat AI
 
-Chat gửi lịch sử hội thoại qua `POST /api/chat/` đến `django_server/ai_service.py`. Mặc định, OpenAI SDK được trỏ vào endpoint tương thích OpenAI của Ollama trên localhost; mô hình mặc định `qwen2.5:3b` chạy cục bộ, không cần API key hosted. Ollama và mô hình được xác minh trước mỗi yêu cầu. Có thể tùy chọn `AI_PROVIDER=openai` cùng `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` để dùng dịch vụ hosted. Django tự nạp `.env` ở thư mục gốc qua `python-dotenv`; biến môi trường hệ thống được ưu tiên. API giới hạn kích thước yêu cầu/lịch sử, số lần gọi, thời gian chờ và token đầu ra; một số thông tin liên hệ hoặc nhạy cảm được ẩn trước khi gửi. Khi thiếu Ollama/mô hình, key hosted sai, hết hạn mức, timeout hoặc mất kết nối, giao diện hiển thị lỗi phù hợp và cho phép thử lại; không có câu trả lời giả lập.
+Chat gửi lịch sử hội thoại qua `POST /api/chat/` đến `django_server/ai_service.py`, dùng OpenAI SDK và `AI_PROVIDER=openai` mặc định. `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` chỉ được đọc ở backend từ `.env` hoặc biến môi trường. Có thể chọn `AI_PROVIDER=openai-compatible` cho endpoint HTTPS tương thích. Django tự nạp `.env` ở thư mục gốc qua `python-dotenv`; biến môi trường hệ thống được ưu tiên. API giới hạn kích thước yêu cầu/lịch sử, số lần gọi, thời gian chờ và token đầu ra; một số thông tin liên hệ hoặc nhạy cảm được ẩn trước khi gửi. Khi thiếu/sai key, hết hạn mức, timeout hoặc mất kết nối, giao diện hiển thị lỗi phù hợp và cho phép thử lại; không có câu trả lời giả lập.
+
+Tài liệu được quản trị viên đặt thủ công trong `knowledge_base/`. `django_server/documents.py` trích xuất PDF, DOCX, TXT và Markdown, chia đoạn và xếp hạng theo độ liên quan; các đoạn phù hợp được gửi kèm câu hỏi và lịch sử cho LLM. Không có API upload công khai. Tài liệu cần được cho phép gửi tới nhà cung cấp trước khi thêm; tệp trong thư mục bị Git bỏ qua.
 
 Dữ liệu phòng, giá và đặt phòng của demo hiện chỉ nằm trong `localStorage`; dự án chưa có database hay xác thực server-side. Vì vậy, API không gửi dữ liệu trình duyệt không đáng tin cậy cho mô hình và hướng dẫn AI không xác nhận thông tin khách sạn trực tiếp hoặc thực hiện thao tác nghiệp vụ.
 
 ## Khởi chạy trên Windows
 
-`start-demo.bat` kiểm tra Python, thư viện, Ollama và mô hình. Khi thiếu mô hình, script tải về và chỉ khởi chạy website sau khi tải thành công. Cấu hình Ollama mặc định nằm trong `.env.example`.
+`start-demo.bat` kiểm tra Python, cài thư viện còn thiếu, tạo `.env` từ mẫu và chỉ mở Notepad khi cần cấu hình API key. Script không cài Ollama hoặc tải mô hình.
 
 ## Verification
 
-- `py manage.py test django_server --noinput`: kiểm thử unit/API với Ollama mock.
+- `py manage.py test django_server --noinput`: kiểm thử unit/API với nhà cung cấp mock.
 - `py manage.py check`: kiểm tra cấu hình Django.
 - Kiểm tra JavaScript inline bằng Node.js.
-- Chưa xác minh suy luận trên Ollama thật nếu Ollama chưa được cài trên máy.
+- Chưa xác minh suy luận với API thật nếu chưa có API key.

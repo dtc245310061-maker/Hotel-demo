@@ -1,12 +1,12 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-set "OLLAMA_MODEL=qwen2.5:3b"
-set "AI_PROVIDER=ollama"
+
 if not exist "dist\index.html" (
-  echo Khong tim thay giao dien dist\index.html trong thu muc du an.
+  echo Khong tim thay giao dien dist\index.html. Hay chay BAT tu thu muc du an.
   goto :fail
 )
+
 where py >nul 2>nul
 if errorlevel 1 (
   echo Khong tim thay Python Launcher. Cai Python 3.10 tro len va chon Python Launcher.
@@ -17,20 +17,18 @@ if errorlevel 1 (
   echo Du an can Python 3.10 tro len. Hay cai ban moi hon va chay lai.
   goto :fail
 )
+
 if not exist ".env" (
   if exist ".env.example" (
     copy /y ".env.example" ".env" >nul
-    echo Da tao .env voi cau hinh Ollama mac dinh.
+    echo Da tao .env voi cau hinh OpenAI mau.
   ) else (
     echo Khong tim thay .env.example. Hay cap nhat lai ma nguon.
     goto :fail
   )
 )
-for /f "tokens=1,* delims==" %%A in ('findstr /b /i "OLLAMA_MODEL=" ".env" 2^>nul') do set "OLLAMA_MODEL=%%B"
-if not defined OLLAMA_MODEL set "OLLAMA_MODEL=qwen2.5:3b"
-for /f "tokens=1,* delims==" %%A in ('findstr /b /i "AI_PROVIDER=" ".env" 2^>nul') do set "AI_PROVIDER=%%B"
 
-py -c "import django, dotenv, openai" >nul 2>nul
+py -c "import django, dotenv, openai, docx, pypdf" >nul 2>nul
 if errorlevel 1 (
   echo Dang cai cac thu vien cua du an...
   py -m pip install -r requirements.txt
@@ -40,57 +38,60 @@ if errorlevel 1 (
   )
 )
 
-if /i "%AI_PROVIDER%"=="openai" goto :start_django
-if /i not "%AI_PROVIDER%"=="ollama" (
-  echo AI_PROVIDER trong .env phai la ollama hoac openai.
-  goto :fail
-)
-
-set "OLLAMA_EXE="
-for /f "delims=" %%I in ('where ollama 2^>nul') do if not defined OLLAMA_EXE set "OLLAMA_EXE=%%I"
-if not defined OLLAMA_EXE if exist "%LOCALAPPDATA%\Programs\Ollama\ollama.exe" set "OLLAMA_EXE=%LOCALAPPDATA%\Programs\Ollama\ollama.exe"
-if not defined OLLAMA_EXE (
-  echo Chua cai Ollama. Tai va cai dat mien phi tu https://ollama.com/download/windows
-  echo Sau khi cai xong, chay lai start-demo.bat.
-  goto :fail
-)
-
-powershell -NoProfile -Command "try { Invoke-RestMethod -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 2 | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
-if errorlevel 1 (
-  echo Dang khoi dong Ollama...
-  start "Ollama Local AI" /min "%OLLAMA_EXE%" serve
-  set "OLLAMA_READY="
-  for /l %%I in (1,1,30) do (
-    powershell -NoProfile -Command "try { Invoke-RestMethod -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 2 | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
-    if not errorlevel 1 set "OLLAMA_READY=1"
-    if defined OLLAMA_READY goto :ollama_started
-    timeout /t 1 /nobreak >nul
-  )
-  echo Ollama chua khoi dong duoc. Hay mo ung dung Ollama tu Start Menu roi chay lai.
-  goto :fail
-)
-:ollama_started
-
-"%OLLAMA_EXE%" list | findstr /b /c:"%OLLAMA_MODEL%" >nul 2>nul
-if errorlevel 1 (
-  echo Mo hinh %OLLAMA_MODEL% chua co. Dang tai ve; lan dau co the mat vai phut...
-  "%OLLAMA_EXE%" pull "%OLLAMA_MODEL%"
-  if errorlevel 1 (
-    echo Tai mo hinh that bai. Kiem tra ket noi Internet va dung luong dia.
-    goto :fail
-  )
-)
-
-:start_django
 py manage.py check
 if errorlevel 1 (
-  echo Ung dung chua san sang. Kiem tra loi ben tren.
+  echo Django chua san sang. Kiem tra loi ben tren.
   goto :fail
 )
-if /i "%AI_PROVIDER%"=="ollama" echo Ollama va mo hinh %OLLAMA_MODEL% da san sang.
-if /i "%AI_PROVIDER%"=="openai" echo Dang chay voi nha cung cap OpenAI da cau hinh.
+
+py -c "from dotenv import load_dotenv; from pathlib import Path; load_dotenv(Path('.env'), override=False); from django_server.ai_service import _config; c=_config(); print('Nha cung cap:', c['provider']); print('Mo hinh:', c['model']); print('API key da duoc cau hinh:', bool(c['api_key']))" > "%TEMP%\lumiere-ai-config.txt" 2>&1
+if errorlevel 1 (
+  type "%TEMP%\lumiere-ai-config.txt"
+  del "%TEMP%\lumiere-ai-config.txt" >nul 2>nul
+  echo Khong doc duoc cau hinh AI. Kiem tra AI_PROVIDER va cac dong trong .env.
+  goto :fail
+)
+type "%TEMP%\lumiere-ai-config.txt"
+set "NEED_API_KEY=0"
+findstr /c:"API key da duoc cau hinh: False" "%TEMP%\lumiere-ai-config.txt" >nul
+if not errorlevel 1 set "NEED_API_KEY=1"
+del "%TEMP%\lumiere-ai-config.txt" >nul 2>nul
+if "%NEED_API_KEY%"=="1" (
+  echo.
+  echo Chua co OPENAI_API_KEY. BAT se mo .env de ban tu nhap key mot lan.
+  echo Khong gui API key cho chatbot hoac commit file .env.
+  start /wait "" notepad "%~dp0.env"
+  py -c "from dotenv import load_dotenv; from pathlib import Path; import os,sys; load_dotenv(Path('.env'), override=False); sys.exit(0 if os.getenv('OPENAI_API_KEY','').strip() else 1)" >nul 2>nul
+  if errorlevel 1 (
+    echo Chua co API key. Website van se chay, nhung Chat AI se bao chua duoc cau hinh.
+  ) else (
+    echo Da tim thay cau hinh API key. Gia tri key khong duoc hien thi.
+  )
+)
+
+powershell -NoProfile -Command "if (Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue) { exit 0 } else { exit 1 }" >nul 2>nul
+if not errorlevel 1 (
+  powershell -NoProfile -Command "try { Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/health/' -TimeoutSec 3 | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
+  if errorlevel 1 (
+    echo Cong 8000 dang duoc ung dung khac su dung. Hay dong ung dung do hoac doi cong.
+    goto :fail
+  )
+  echo Website Django dang chay tai cong 8000.
+  goto :open_website
+)
+
 start "Lumiere Django Demo" cmd /k "py manage.py runserver 127.0.0.1:8000"
-timeout /t 2 /nobreak >nul
+set "DJANGO_READY="
+for /l %%I in (1,1,30) do (
+  powershell -NoProfile -Command "try { Invoke-RestMethod -Uri 'http://127.0.0.1:8000/api/health/' -TimeoutSec 2 | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
+  if not errorlevel 1 set "DJANGO_READY=1"
+  if defined DJANGO_READY goto :open_website
+  timeout /t 1 /nobreak >nul
+)
+echo Django khong phan hoi tai cong 8000. Kiem tra cua so server va xem cong co bi ung dung khac su dung khong.
+goto :fail
+
+:open_website
 start "" "http://127.0.0.1:8000/"
 exit /b 0
 

@@ -5,7 +5,8 @@ from django.http import FileResponse, JsonResponse
 from django.urls import path
 from django.views.decorators.http import require_POST
 
-from django_server.ai_service import ChatError, get_chat_reply, is_rate_limited
+from django_server.ai_service import get_chat_reply, is_rate_limited
+from django_server.chat_errors import ChatError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 INDEX_FILE = BASE_DIR / 'dist' / 'index.html'
