@@ -14,8 +14,11 @@ from django_server import ai_service, documents
 from django_server.chat_errors import ChatError
 
 
-def provider_completion(content):
-    return SimpleNamespace(text=content)
+def provider_completion(content, finish_reason=None):
+    candidates = []
+    if finish_reason is not None:
+        candidates = [SimpleNamespace(finish_reason=finish_reason)]
+    return SimpleNamespace(text=content, candidates=candidates)
 
 
 class ChatApiTests(SimpleTestCase):
@@ -128,6 +131,28 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(config['provider'], 'gemini')
         self.assertEqual(config['model'], 'gemini-2.5-flash')
 
+    def test_system_prompt_supports_math_programming_and_open_questions(self):
+        prompt = ai_service._system_prompt()
+        self.assertIn('giải toán', prompt)
+        self.assertIn('mã lập trình', prompt)
+        self.assertIn('công thức', prompt)
+        self.assertIn('Không giới hạn trợ giúp vào chủ đề khách sạn', prompt)
+
+    @patch('django_server.ai_service.genai.Client')
+    def test_rejects_truncated_completion_and_logs_no_api_key(self, gemini_client):
+        gemini_client.return_value.models.generate_content.return_value = provider_completion(
+            'def total(n):',
+            finish_reason=ai_service.types.FinishReason.MAX_TOKENS,
+        )
+        with self.assertLogs('django_server.ai_service', level='WARNING') as logs:
+            with self.assertRaises(ChatError) as error:
+                ai_service._request_completion([{'role': 'user', 'content': 'Viết code'}])
+
+        self.assertEqual(error.exception.status, 502)
+        self.assertIn('vượt quá giới hạn', error.exception.message)
+        self.assertTrue(any('output token limit' in entry for entry in logs.output))
+        self.assertNotIn('test-key', '\n'.join(logs.output))
+
     @patch('django_server.ai_service.genai.Client')
     def test_document_context_is_passed_as_system_instruction(self, gemini_client):
         gemini_client.return_value.models.generate_content.return_value = provider_completion(
@@ -174,11 +199,13 @@ class ChatApiTests(SimpleTestCase):
                 }},
             )
         )
-        with self.assertRaises(ChatError) as error:
-            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
+        with self.assertLogs('django_server.ai_service', level='WARNING') as logs:
+            with self.assertRaises(ChatError) as error:
+                ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 502)
         self.assertIn('không hợp lệ', error.exception.message)
         self.assertNotIn('test-key', error.exception.message)
+        self.assertNotIn('test-key', '\n'.join(logs.output))
 
     @patch('django_server.ai_service.genai.Client')
     def test_quota_error_is_reported(self, gemini_client):
