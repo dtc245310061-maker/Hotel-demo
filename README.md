@@ -15,11 +15,13 @@ Lần đầu, BAT tạo `.env`, cài thư viện còn thiếu và mở Notepad. 
 
 ## Render
 
-Tạo Web Service từ repository bằng **New > Blueprint**. Trong Environment, thêm `GEMINI_API_KEY` với key của chủ dự án, rồi deploy. Sau khi deploy, kiểm tra `/api/health/` trên URL Render; chưa có URL deploy nào được xác nhận trong README này.
+Trong Render, chọn **New > Blueprint** và repository này. `render.yaml` đã đặt loại **Web Service**, `plan: free`, không tạo database và khai báo `GEMINI_API_KEY` là biến bí mật cần nhập riêng. Trước khi xác nhận, kiểm tra màn hình chỉ hiển thị gói **Free**; không nâng cấp service, không thêm database và không thêm phương thức thanh toán. Nếu Render yêu cầu chọn gói trả phí hoặc nhập phương thức thanh toán, dừng lại.
+
+Nhập API key của bạn vào ô `GEMINI_API_KEY` trong Environment rồi tạo/deploy service. Không đưa key vào GitHub hoặc trình duyệt. Chỉ mở URL `.onrender.com` Render cấp sau khi deploy xong; kiểm tra URL đó cùng `/api/health/`. Chưa có service/URL triển khai thực tế được xác nhận. Free Web Service có thể ngủ sau 15 phút không hoạt động và mất khoảng một phút để thức dậy; giới hạn Free của Render có thể làm service tạm ngưng hoặc không nhận deploy mới.
 
 ## Lưu ý
 
-- Mặc định dùng `gemini-2.5-flash`. Gemini API có Free Tier nhưng hạn mức model/tài khoản có thể thay đổi; xem [bảng giá](https://ai.google.dev/gemini-api/docs/pricing) và [hạn mức](https://ai.google.dev/gemini-api/docs/rate-limits) hiện hành. Không bật thanh toán nếu muốn tránh phát sinh phí.
+- Mặc định dùng `gemini-2.5-flash`, được Google liệt kê có Free Tier tại thời điểm kiểm tra. Hạn mức và điều kiện áp dụng phụ thuộc tài khoản, có thể thay đổi; xác nhận trong Google AI Studio và xem [bảng giá](https://ai.google.dev/gemini-api/docs/pricing) cùng [hạn mức](https://ai.google.dev/gemini-api/docs/rate-limits). Chỉ dùng khi tài khoản có Free Tier; không kích hoạt thanh toán hoặc paid tier. Nếu tài khoản yêu cầu bật thanh toán để gọi model, không tiếp tục.
 - Giữ key trong `.env` hoặc secret Environment trên Render; không gửi key qua chat, không đưa vào frontend hoặc GitHub. `.env` được Git ignore.
 - Nội dung chat được gửi tới Gemini để tạo câu trả lời. Theo điều khoản Free Tier của Google, dữ liệu có thể được dùng để cải thiện sản phẩm; không nhập thông tin cá nhân hoặc bí mật.
 - Dữ liệu phòng, dịch vụ và đặt phòng chỉ lưu trong `localStorage` của trình duyệt. Chưa có database khách sạn ở backend; Chat AI không thể tra cứu dữ liệu đó.
