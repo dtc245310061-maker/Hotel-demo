@@ -21,14 +21,16 @@ if errorlevel 1 (
 if not exist ".env" (
   if exist ".env.example" (
     copy /y ".env.example" ".env" >nul
-    echo Da tao .env voi cau hinh OpenAI mau.
+    echo Da tao .env voi cau hinh Gemini mau.
   ) else (
     echo Khong tim thay .env.example. Hay cap nhat lai ma nguon.
     goto :fail
   )
 )
 
-py -c "import django, dotenv, openai, docx, pypdf" >nul 2>nul
+set "AI_PROVIDER=gemini"
+
+py -c "import django, dotenv, google.genai, httpx, docx, pypdf" >nul 2>nul
 if errorlevel 1 (
   echo Dang cai cac thu vien cua du an...
   py -m pip install -r requirements.txt
@@ -58,10 +60,10 @@ if not errorlevel 1 set "NEED_API_KEY=1"
 del "%TEMP%\lumiere-ai-config.txt" >nul 2>nul
 if "%NEED_API_KEY%"=="1" (
   echo.
-  echo Chua co OPENAI_API_KEY. BAT se mo .env de ban tu nhap key mot lan.
+  echo Chua co GEMINI_API_KEY. BAT se mo .env de ban tu nhap key mot lan.
   echo Khong gui API key cho chatbot hoac commit file .env.
   start /wait "" notepad "%~dp0.env"
-  py -c "from dotenv import load_dotenv; from pathlib import Path; import os,sys; load_dotenv(Path('.env'), override=False); sys.exit(0 if os.getenv('OPENAI_API_KEY','').strip() else 1)" >nul 2>nul
+  py -c "from dotenv import load_dotenv; from pathlib import Path; import os,sys; load_dotenv(Path('.env'), override=False); sys.exit(0 if os.getenv('GEMINI_API_KEY','').strip() else 1)" >nul 2>nul
   if errorlevel 1 (
     echo Chua co API key. Website van se chay, nhung Chat AI se bao chua duoc cau hinh.
   ) else (

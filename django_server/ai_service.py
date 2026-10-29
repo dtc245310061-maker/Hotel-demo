@@ -3,17 +3,11 @@ import re
 import time
 import threading
 from collections import defaultdict, deque
-from urllib.parse import urlparse
 
-from openai import (
-    APIConnectionError,
-    APIStatusError,
-    APITimeoutError,
-    AuthenticationError,
-    OpenAI,
-    PermissionDeniedError,
-    RateLimitError,
-)
+import httpx
+from google import genai
+from google.genai import errors as genai_errors
+from google.genai import types
 
 from django_server.chat_errors import ChatError
 from django_server.documents import find_relevant_passages
@@ -35,28 +29,17 @@ _GLOBAL_REQUEST_TIMES = deque()
 
 
 def _config():
-    provider = os.environ.get('AI_PROVIDER', 'openai').strip().lower()
-    if provider not in {'openai', 'openai-compatible'}:
+    provider = os.environ.get('AI_PROVIDER', 'gemini').strip().lower()
+    if provider != 'gemini':
         raise ChatError(
-            'AI_PROVIDER hiện hỗ trợ openai hoặc openai-compatible. Hãy kiểm tra tệp .env.',
+            'AI_PROVIDER hiện chỉ hỗ trợ gemini. Hãy kiểm tra tệp .env.',
             503,
         )
-    base_url = os.environ.get('OPENAI_BASE_URL', '').strip()
     return {
         'provider': provider,
-        'api_key': os.environ.get('OPENAI_API_KEY', '').strip(),
-        'model': os.environ.get('OPENAI_MODEL', '').strip() or 'gpt-4o-mini',
-        'base_url': (base_url or 'https://api.openai.com/v1').rstrip('/'),
+        'api_key': os.environ.get('GEMINI_API_KEY', '').strip(),
+        'model': os.environ.get('GEMINI_MODEL', '').strip() or 'gemini-2.5-flash',
     }
-
-
-def _validate_base_url(base_url):
-    parsed_url = urlparse(base_url)
-    if parsed_url.scheme != 'https' or not parsed_url.netloc:
-        raise ChatError(
-            'OPENAI_BASE_URL phải là URL HTTPS hợp lệ để bảo vệ API key.',
-            503,
-        )
 
 
 def _sanitize_message(text):
@@ -133,54 +116,75 @@ def _request_completion(messages):
     config = _config()
     if not config['api_key']:
         raise ChatError(
-            'Chat AI chưa được cấu hình trên máy chủ. Hãy báo quản trị viên bổ sung OPENAI_API_KEY.',
+            'Chat AI chưa được cấu hình trên máy chủ. Hãy báo quản trị viên bổ sung GEMINI_API_KEY.',
             503,
         )
-    _validate_base_url(config['base_url'])
 
+    client = None
     try:
-        client = OpenAI(
+        client = genai.Client(
             api_key=config['api_key'],
-            base_url=config['base_url'],
-            timeout=PROVIDER_TIMEOUT_SECONDS,
-            max_retries=0,
+            http_options=types.HttpOptions(
+                timeout=PROVIDER_TIMEOUT_SECONDS * 1000,
+                retry_options=types.HttpRetryOptions(attempts=1),
+            ),
         )
-        completion = client.chat.completions.create(
+        system_instruction = _system_prompt()
+        conversation = []
+        for message in messages:
+            if message['role'] == 'system':
+                system_instruction += f"\n\n{message['content']}"
+            else:
+                conversation.append(types.Content(
+                    role='model' if message['role'] == 'assistant' else 'user',
+                    parts=[types.Part.from_text(text=message['content'])],
+                ))
+        response = client.models.generate_content(
             model=config['model'],
-            messages=[
-                {'role': 'system', 'content': _system_prompt()},
-                *messages,
-            ],
-            max_tokens=MAX_COMPLETION_TOKENS,
-            temperature=0.4,
+            contents=conversation,
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                max_output_tokens=MAX_COMPLETION_TOKENS,
+                temperature=0.4,
+            ),
         )
-    except AuthenticationError:
-        raise ChatError('API key không hợp lệ hoặc đã hết hạn. Hãy kiểm tra OPENAI_API_KEY trong tệp .env.', 502) from None
-    except PermissionDeniedError:
-        raise ChatError('API key không có quyền truy cập mô hình hoặc dịch vụ đã cấu hình.', 502) from None
-    except RateLimitError:
-        raise ChatError(
-            'API đã chạm giới hạn sử dụng hoặc hết hạn mức. Hãy kiểm tra hạn mức/tài khoản của nhà cung cấp.',
-            503,
-        ) from None
-    except APITimeoutError:
+    except httpx.TimeoutException:
         raise ChatError('AI phản hồi quá thời gian chờ. Vui lòng thử lại.', 504) from None
-    except APIConnectionError:
+    except httpx.TransportError:
         raise ChatError(
-            'Không thể kết nối với dịch vụ AI. Hãy kiểm tra Internet và OPENAI_BASE_URL.',
+            'Không thể kết nối với Gemini API. Hãy kiểm tra kết nối Internet rồi thử lại.',
             502,
         ) from None
-    except APIStatusError as error:
+    except genai_errors.APIError as error:
+        if error.code == 429:
+            raise ChatError(
+                'Gemini API đã chạm giới hạn sử dụng hoặc hết hạn mức miễn phí. Hãy kiểm tra hạn mức Google AI Studio.',
+                503,
+            ) from None
+        if error.code in {401, 403} or (
+            error.code == 400
+            and 'api key' in (error.message or '').lower()
+        ):
+            raise ChatError(
+                'Gemini API key không hợp lệ hoặc chưa được cấp quyền. Hãy kiểm tra GEMINI_API_KEY.',
+                502,
+            ) from None
+        if error.code in {408, 504}:
+            raise ChatError('AI phản hồi quá thời gian chờ. Vui lòng thử lại.', 504) from None
+        if error.code >= 500:
+            raise ChatError('Gemini API đang gặp sự cố. Vui lòng thử lại sau.', 502) from None
         raise ChatError(
-            f"Dịch vụ AI từ chối yêu cầu (HTTP {error.status_code}). Hãy kiểm tra model và OPENAI_BASE_URL.",
+            'Gemini API từ chối yêu cầu. Hãy kiểm tra tên mô hình và cấu hình Gemini.',
             502,
         ) from None
+    finally:
+        if client is not None:
+            client.close()
 
-    try:
-        reply = completion.choices[0].message.content
-    except (AttributeError, IndexError, TypeError):
+    reply = getattr(response, 'text', None)
+    if not isinstance(reply, str):
         raise ChatError('AI chưa trả về câu trả lời hợp lệ. Vui lòng thử lại sau.', 502) from None
-    if not isinstance(reply, str) or not reply.strip():
+    if not reply.strip():
         raise ChatError('AI trả về câu trả lời trống. Vui lòng gửi lại câu hỏi.', 502)
     return reply.strip()
 

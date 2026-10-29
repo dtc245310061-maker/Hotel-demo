@@ -2,7 +2,7 @@
 
 ## Trạng thái
 
-Demo chạy local bằng Django. Chat mặc định gọi OpenAI API; cần API key do người dùng cấu hình trong `.env`. BAT kiểm tra Python/dependencies/cấu hình và chạy website, không cài Ollama hoặc tải mô hình.
+Demo chạy local bằng Django. Chat mặc định gọi Gemini API với `gemini-2.5-flash`; cần `GEMINI_API_KEY` trong `.env`. BAT kiểm tra Python/dependencies/cấu hình và chạy website, không cài Ollama hoặc tải mô hình.
 
 Không dùng production: dữ liệu nghiệp vụ vẫn ở `localStorage`, chưa có database hoặc xác thực server-side. Do đó AI không nhận dữ liệu phòng/đặt phòng trực tiếp và không được dùng để thay đổi dữ liệu.
 
@@ -13,4 +13,4 @@ Không dùng production: dữ liệu nghiệp vụ vẫn ở `localStorage`, ch�
 - Kiểm tra cú pháp JavaScript inline bằng Node.js: thành công.
 - `git diff --check`: không phát hiện lỗi whitespace.
 
-Chưa gọi OpenAI API thật vì môi trường hiện tại không có API key; chưa chạy hồi quy đăng nhập/đặt phòng trên trình duyệt. Chi tiết ở [docs/05_review_testing.md](./05_review_testing.md).
+Chưa gọi Gemini API thật vì môi trường hiện tại chưa có Gemini API key; chưa chạy hồi quy đăng nhập/đặt phòng trên trình duyệt. Chi tiết ở [docs/05_review_testing.md](./05_review_testing.md).

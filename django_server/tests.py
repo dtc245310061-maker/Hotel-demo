@@ -6,6 +6,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import httpx
+
 from django.test import Client, SimpleTestCase
 
 from django_server import ai_service, documents
@@ -13,9 +15,7 @@ from django_server.chat_errors import ChatError
 
 
 def provider_completion(content):
-    return SimpleNamespace(
-        choices=[SimpleNamespace(message=SimpleNamespace(content=content))]
-    )
+    return SimpleNamespace(text=content)
 
 
 class ChatApiTests(SimpleTestCase):
@@ -23,10 +23,9 @@ class ChatApiTests(SimpleTestCase):
         ai_service._REQUEST_TIMES.clear()
         ai_service._GLOBAL_REQUEST_TIMES.clear()
         self.environment = patch.dict(os.environ, {
-            'AI_PROVIDER': 'openai',
-            'OPENAI_API_KEY': 'test-key',
-            'OPENAI_MODEL': 'test-model',
-            'OPENAI_BASE_URL': 'https://example.test/v1',
+            'AI_PROVIDER': 'gemini',
+            'GEMINI_API_KEY': 'test-key',
+            'GEMINI_MODEL': 'test-model',
         })
         self.environment.start()
         self.addCleanup(self.environment.stop)
@@ -46,9 +45,9 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(response.status_code, 403)
 
     @patch('django_server.urls.is_rate_limited', return_value=False)
-    @patch('django_server.ai_service.OpenAI')
-    def test_chat_accepts_csrf_token_set_by_homepage(self, openai_client, _rate_limit):
-        openai_client.return_value.chat.completions.create.return_value = provider_completion(
+    @patch('django_server.ai_service.genai.Client')
+    def test_chat_accepts_csrf_token_set_by_homepage(self, gemini_client, _rate_limit):
+        gemini_client.return_value.models.generate_content.return_value = provider_completion(
             'Xin chào!'
         )
         client = Client(enforce_csrf_checks=True)
@@ -68,16 +67,17 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('JSON', response.json()['message'])
 
-    @patch.dict(os.environ, {'AI_PROVIDER': 'openai', 'OPENAI_API_KEY': ''})
+    @patch.dict(os.environ, {'AI_PROVIDER': 'gemini', 'GEMINI_API_KEY': ''})
     def test_missing_api_key_returns_clear_setup_error(self):
         with self.assertRaises(ChatError) as error:
             ai_service._request_completion([{'role': 'user', 'content': 'Xin chào'}])
         self.assertEqual(error.exception.status, 503)
         self.assertIn('quản trị viên', error.exception.message)
+        self.assertIn('GEMINI_API_KEY', error.exception.message)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_chat_calls_openai_with_config_and_full_conversation(self, openai_client):
-        openai_client.return_value.chat.completions.create.return_value = provider_completion(
+    @patch('django_server.ai_service.genai.Client')
+    def test_chat_calls_gemini_with_config_and_full_conversation(self, gemini_client):
+        gemini_client.return_value.models.generate_content.return_value = provider_completion(
             'Xin chào!'
         )
         response = self.client.post(
@@ -92,45 +92,57 @@ class ChatApiTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'reply': 'Xin chào!'})
-        openai_client.assert_called_once_with(
+        gemini_client.assert_called_once_with(
             api_key='test-key',
-            base_url='https://example.test/v1',
-            timeout=ai_service.PROVIDER_TIMEOUT_SECONDS,
-            max_retries=0,
+            http_options=ai_service.types.HttpOptions(
+                timeout=ai_service.PROVIDER_TIMEOUT_SECONDS * 1000,
+                retry_options=ai_service.types.HttpRetryOptions(attempts=1),
+            ),
         )
-        request = openai_client.return_value.chat.completions.create.call_args.kwargs
+        request = gemini_client.return_value.models.generate_content.call_args.kwargs
         self.assertEqual(request['model'], 'test-model')
-        self.assertEqual(request['max_tokens'], ai_service.MAX_COMPLETION_TOKENS)
-        self.assertEqual(request['messages'][-3:], [
-            {'role': 'user', 'content': 'Xin chào'},
-            {'role': 'assistant', 'content': 'Chào bạn!'},
-            {'role': 'user', 'content': 'Bạn vừa nói gì?'},
-        ])
-
-    @patch.dict(os.environ, {'AI_PROVIDER': 'openai-compatible'})
-    @patch('django_server.ai_service.OpenAI')
-    def test_openai_compatible_provider_uses_configured_base_url(self, openai_client):
-        openai_client.return_value.chat.completions.create.return_value = provider_completion(
-            'Reply'
-        )
-        config = ai_service._config()
-        self.assertEqual(config['provider'], 'openai-compatible')
+        self.assertEqual(request['config'].max_output_tokens, ai_service.MAX_COMPLETION_TOKENS)
         self.assertEqual(
-            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}]),
-            'Reply',
+            request['config'].system_instruction,
+            ai_service._system_prompt(),
+        )
+        self.assertEqual(
+            [(message.role, message.parts[0].text) for message in request['contents']],
+            [
+                ('user', 'Xin chào'),
+                ('model', 'Chào bạn!'),
+                ('user', 'Bạn vừa nói gì?'),
+            ],
         )
 
     @patch.dict(os.environ, {'AI_PROVIDER': 'ollama'})
-    def test_ollama_is_not_started_or_used_in_online_mode(self):
+    def test_ollama_provider_is_not_used(self):
         with self.assertRaises(ChatError) as error:
             ai_service._config()
         self.assertEqual(error.exception.status, 503)
-        self.assertIn('openai', error.exception.message)
+        self.assertIn('gemini', error.exception.message)
 
-    def test_base_url_requires_https(self):
-        with self.assertRaises(ChatError) as error:
-            ai_service._validate_base_url('http://127.0.0.1:11434')
-        self.assertEqual(error.exception.status, 503)
+    def test_gemini_is_the_default_provider_and_model(self):
+        with patch.dict(os.environ, {}, clear=True):
+            config = ai_service._config()
+        self.assertEqual(config['provider'], 'gemini')
+        self.assertEqual(config['model'], 'gemini-2.5-flash')
+
+    @patch('django_server.ai_service.genai.Client')
+    def test_document_context_is_passed_as_system_instruction(self, gemini_client):
+        gemini_client.return_value.models.generate_content.return_value = provider_completion(
+            'Đã tra cứu tài liệu.'
+        )
+        ai_service._request_completion([
+            {'role': 'system', 'content': 'Trích từ policy.pdf: nhận phòng lúc 14 giờ.'},
+            {'role': 'user', 'content': 'Giờ nhận phòng là mấy giờ?'},
+        ])
+        request = gemini_client.return_value.models.generate_content.call_args.kwargs
+        self.assertIn('Trích từ policy.pdf', request['config'].system_instruction)
+        self.assertEqual(
+            request['contents'][0].parts[0].text,
+            'Giờ nhận phòng là mấy giờ?',
+        )
 
     def test_chat_redacts_private_details_before_provider_call(self):
         message = ai_service._parse_messages([{
@@ -151,49 +163,62 @@ class ChatApiTests(SimpleTestCase):
             ai_service._parse_messages([{'role': 'user', 'content': 'a' * 2001}])
         self.assertEqual(error.exception.status, 400)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_invalid_key_error_does_not_expose_provider_details(self, openai_client):
-        with patch('django_server.ai_service.AuthenticationError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError(
-                'provider error containing test-key'
+    @patch('django_server.ai_service.genai.Client')
+    def test_invalid_key_error_does_not_expose_provider_details(self, gemini_client):
+        gemini_client.return_value.models.generate_content.side_effect = (
+            ai_service.genai_errors.APIError(
+                403,
+                {'error': {
+                    'message': 'API key not valid: test-key',
+                    'status': 'PERMISSION_DENIED',
+                }},
             )
-            with self.assertRaises(ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
+        )
+        with self.assertRaises(ChatError) as error:
+            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 502)
         self.assertIn('không hợp lệ', error.exception.message)
         self.assertNotIn('test-key', error.exception.message)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_quota_error_is_reported(self, openai_client):
-        with patch('django_server.ai_service.RateLimitError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError('quota')
-            with self.assertRaises(ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
+    @patch('django_server.ai_service.genai.Client')
+    def test_quota_error_is_reported(self, gemini_client):
+        gemini_client.return_value.models.generate_content.side_effect = (
+            ai_service.genai_errors.APIError(
+                429,
+                {'error': {'message': 'Quota exceeded', 'status': 'RESOURCE_EXHAUSTED'}},
+            )
+        )
+        with self.assertRaises(ChatError) as error:
+            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 503)
         self.assertIn('hết hạn mức', error.exception.message)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_connection_error_is_reported(self, openai_client):
-        with patch('django_server.ai_service.APIConnectionError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError('offline')
-            with self.assertRaises(ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
+    @patch('django_server.ai_service.genai.Client')
+    def test_connection_error_is_reported(self, gemini_client):
+        gemini_client.return_value.models.generate_content.side_effect = httpx.ConnectError(
+            'offline',
+            request=httpx.Request('GET', 'https://generativelanguage.googleapis.com'),
+        )
+        with self.assertRaises(ChatError) as error:
+            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 502)
         self.assertIn('Internet', error.exception.message)
         self.assertNotIn('offline', error.exception.message)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_timeout_error_is_reported(self, openai_client):
-        with patch('django_server.ai_service.APITimeoutError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError()
-            with self.assertRaises(ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
+    @patch('django_server.ai_service.genai.Client')
+    def test_timeout_error_is_reported(self, gemini_client):
+        gemini_client.return_value.models.generate_content.side_effect = httpx.ReadTimeout(
+            'timeout',
+            request=httpx.Request('POST', 'https://generativelanguage.googleapis.com'),
+        )
+        with self.assertRaises(ChatError) as error:
+            ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 504)
         self.assertIn('thời gian chờ', error.exception.message)
 
-    @patch('django_server.ai_service.OpenAI')
-    def test_empty_provider_reply_is_not_returned_as_success(self, openai_client):
-        openai_client.return_value.chat.completions.create.return_value = provider_completion(' ')
+    @patch('django_server.ai_service.genai.Client')
+    def test_empty_provider_reply_is_not_returned_as_success(self, gemini_client):
+        gemini_client.return_value.models.generate_content.return_value = provider_completion(' ')
         with self.assertRaises(ChatError) as error:
             ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
         self.assertEqual(error.exception.status, 502)
