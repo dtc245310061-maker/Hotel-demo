@@ -243,6 +243,10 @@
     let selectedRoomId = '';
     let chatOpen = false;
     let chatMessages = [];
+    let chatPending = false;
+    let chatError = '';
+    let chatFailedQuestion = '';
+    let chatAbortController = null;
     let toastTimer;
     const syncDemoState = () => {
       const totals = data.bookings.reduce((acc, booking) => {
@@ -337,7 +341,6 @@
       if(q.includes('xin loi')||q.includes('cam on'))return 'Rất vui được hỗ trợ. Bạn cứ hỏi về phòng, giá, dịch vụ, đánh giá hoặc đặt phòng nhé.';
       return 'Tôi chưa tìm thấy dữ liệu để trả lời câu này. Tôi hỗ trợ tra cứu phòng trống, giá và ngân sách, dịch vụ, đánh giá, lịch đặt; tài khoản quản trị còn có thể hỏi doanh thu và tình trạng vận hành. Hãy thử hỏi cụ thể hơn.';
     }
-    function sendChat(question){const text=String(question||'').trim();if(!text)return;chatMessages.push({from:'user',text},{from:'ai',text:answerQuestion(text)});chatMessages=chatMessages.slice(-24);chatOpen=true;render();const log=document.getElementById('chat-log');if(log)log.scrollTop=log.scrollHeight;}
     document.addEventListener('click',event=>{
       const pageButton=event.target.closest('[data-page]');
       if(pageButton){page=pageButton.dataset.page;document.getElementById('sidebar')?.classList.remove('open');render();return;}
@@ -352,9 +355,11 @@
       const action=actionButton.dataset.action;
       switch(action){
         case'menu':document.getElementById('sidebar')?.classList.toggle('open');break;
-        case'logout':data.session=null;save();chatMessages=[];render();break;
+        case'logout':chatAbortController?.abort();chatAbortController=null;chatPending=false;chatError='';chatFailedQuestion='';data.session=null;save();chatMessages=[];render();break;
         case'chat-open':chatOpen=true;render();break;
         case'chat-close':chatOpen=false;render();break;
+        case'chat-new':chatAbortController?.abort();chatAbortController=null;chatPending=false;chatError='';chatFailedQuestion='';chatMessages=[];chatOpen=true;render();break;
+        case'chat-retry':sendChat(chatFailedQuestion,true);break;
         case'close-modal':if(event.target.classList.contains('overlay')||event.target===actionButton)closeModal();break;
         case'book':bookRoom(actionButton.dataset.room);break;
         case'add-room':showRoomForm();break;
@@ -414,12 +419,11 @@
     }
 
     function renderChat(){
-      const publicVisitor=!data.session;
-      const title=publicVisitor?'Hỏi về phòng và trải nghiệm':isAdmin()?'Hỗ trợ báo cáo và vận hành':'Tư vấn phòng, giá và dịch vụ';
-      const welcome=publicVisitor?'Xin chào! Tôi có thể giúp bạn tìm phòng, chọn dịch vụ hoặc trả lời câu hỏi về kỳ nghỉ tại Lumière.':isAdmin()?'Xin chào. Tôi có thể tra cứu doanh thu, tình trạng phòng, đặt phòng và dịch vụ từ dữ liệu demo.':`Xin chào ${data.session.name.split(' ').pop()}! Tôi có thể tìm phòng phù hợp, kiểm tra giá, dịch vụ, đánh giá và lịch đặt của bạn.`;
+      const title='Tư vấn và trò chuyện';
+      const welcome='Xin chào! Tôi có thể trò chuyện, trả lời kiến thức chung và tư vấn. Dữ liệu hiện tại về phòng, giá và đặt phòng chưa được kết nối với AI.';
       if(!chatMessages.length)chatMessages=[{from:'ai',text:welcome}];
-      const suggestions=publicVisitor?['Phòng dưới 2 triệu','Dịch vụ có gì?','Cách đặt phòng?']:isAdmin()?['Báo cáo doanh thu','Phòng nào đang trống?','Đặt phòng chờ xác nhận']:['Gợi ý phòng dưới 3 triệu cho 3 người','Dịch vụ dưới 500 nghìn','Lịch đặt của tôi'];
-      return `<div class="chat-wrap">${chatOpen?`<section class="chat-panel"><header class="chat-head"><div><strong>Lumière AI</strong><small>${title} · Trợ lý dữ liệu</small></div><button data-action="chat-close" aria-label="Đóng chat">×</button></header><div class="chat-log" id="chat-log">${chatMessages.map(message=>`<div class="chat-message ${message.from}">${escapeHtml(message.text)}</div>`).join('')}</div><div class="suggestions">${suggestions.map(text=>`<button data-question="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join('')}</div><form id="chat-form" class="chat-form"><input name="question" placeholder="Nhập câu hỏi..." aria-label="Nhập câu hỏi cho Lumière AI" autocomplete="off"><button aria-label="Gửi câu hỏi">Gửi</button></form></section>`:`<button class="chat-toggle" data-action="chat-open"><span>✦</span>Lumière AI</button>`}</div>`;
+      const suggestions=['Chào bạn!','Tư vấn chuyến đi cuối tuần','Giải thích trí tuệ nhân tạo'];
+      return `<div class="chat-wrap">${chatOpen?`<section class="chat-panel"><header class="chat-head"><div><strong>Lumière AI</strong><small>${title} · Trợ lý hội thoại</small></div><div style="display:flex;gap:5px"><button data-action="chat-new" aria-label="Tạo cuộc trò chuyện mới" title="Cuộc trò chuyện mới">＋</button><button data-action="chat-close" aria-label="Đóng chat">×</button></div></header><div class="chat-log" id="chat-log">${chatMessages.map(message=>`<div class="chat-message ${message.from}">${escapeHtml(message.text)}</div>`).join('')}${chatPending?'<div class="chat-message ai" role="status">AI đang trả lời…</div>':''}${chatError?`<div class="chat-message ai" role="alert" style="color:#a33">${escapeHtml(chatError)}${chatFailedQuestion?'<br><button data-action="chat-retry" style="text-decoration:underline">Gửi lại</button>':''}</div>`:''}</div><div class="suggestions">${suggestions.map(text=>`<button data-question="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join('')}</div><form id="chat-form" class="chat-form"><input name="question" maxlength="2000" placeholder="Nhập câu hỏi..." aria-label="Nhập câu hỏi cho Lumière AI" autocomplete="off" ${chatPending?'disabled':''}><button aria-label="Gửi câu hỏi" ${chatPending?'disabled':''}>Gửi</button></form></section>`:`<button class="chat-toggle" data-action="chat-open"><span>✦</span>Lumière AI</button>`}</div>`;
     }
 
     function parseBudget(text){
@@ -462,7 +466,50 @@
       return 'Tôi chưa tìm thấy dữ liệu cho câu hỏi này. Tôi hỗ trợ tra cứu phòng trống, giá và ngân sách, sức chứa, dịch vụ, đánh giá, đặt phòng và chính sách được khai báo trong demo. Hãy thử hỏi cụ thể hơn.';
     }
 
-    function sendChat(question){const text=String(question||'').trim();if(!text)return;chatMessages.push({from:'user',text},{from:'ai',text:answerQuestion(text)});chatMessages=chatMessages.slice(-24);chatOpen=true;render();const log=document.getElementById('chat-log');if(log)log.scrollTop=log.scrollHeight;}
+    async function sendChat(question,retry=false){
+      const text=String(question||'').trim();
+      if(!text||chatPending)return;
+      if(!retry){chatMessages.push({from:'user',text});chatFailedQuestion=text;}
+      chatPending=true;
+      chatError='';
+      chatOpen=true;
+      render();
+      const controller=new AbortController();
+      chatAbortController=controller;
+      const timeout=setTimeout(()=>controller.abort(),30000);
+      try{
+        const response=await fetch('/api/chat/',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({messages:chatMessages.slice(-24).map(message=>({
+            role:message.from==='ai'?'assistant':'user',
+            content:message.text
+          }))}),
+          signal:controller.signal
+        });
+        let payload={};
+        try{payload=await response.json();}catch{}
+        if(!response.ok)throw new Error(payload.message||'Không thể nhận câu trả lời từ AI. Vui lòng thử lại.');
+        if(typeof payload.reply!=='string'||!payload.reply.trim())throw new Error('AI chưa trả về câu trả lời hợp lệ. Vui lòng thử lại.');
+        chatMessages.push({from:'ai',text:payload.reply.trim()});
+        chatMessages=chatMessages.slice(-24);
+        chatFailedQuestion='';
+      }catch(error){
+        if(chatAbortController!==controller)return;
+        chatError=error.name==='AbortError'
+          ?'Yêu cầu mất quá nhiều thời gian. Hãy thử gửi lại.'
+          :error.message||'Không thể kết nối với AI. Hãy thử lại sau.';
+      }finally{
+        clearTimeout(timeout);
+        if(chatAbortController===controller){
+          chatAbortController=null;
+          chatPending=false;
+          render();
+          const log=document.getElementById('chat-log');
+          if(log)log.scrollTop=log.scrollHeight;
+        }
+      }
+    }
 
     function bookRoom(roomId){
       const room=data.rooms.find(item=>item.id===roomId);

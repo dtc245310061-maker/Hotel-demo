@@ -12,7 +12,7 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-py -c "import django" >nul 2>nul
+py -c "import django, dotenv, openai" >nul 2>nul
 if errorlevel 1 (
   echo Dang cai Django theo requirements.txt...
   py -m pip install -r requirements.txt

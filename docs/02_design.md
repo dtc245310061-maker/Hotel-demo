@@ -18,7 +18,7 @@ Demo dùng Django để phục vụ một trang `dist/index.html` tự chứa HT
 | REQ-ROOM | DES-ROOM | Danh sách phòng, lọc và trạng thái |
 | REQ-BOOKING | DES-BOOKING | Modal đặt phòng, lịch đặt, hủy và trả phòng |
 | REQ-SERVICE | DES-SERVICE | Bảng giá và quản lý dịch vụ |
-| REQ-AI | DES-AI | Trợ lý quy tắc tra dữ liệu demo |
+| REQ-AI | DES-AI | Chat hội thoại qua API LLM phía Django; không gửi khóa bí mật hoặc dữ liệu localStorage |
 | REQ-UX | DES-UX | CSS responsive, tiếng Việt |
 
 ## Skills.sh Evidence
