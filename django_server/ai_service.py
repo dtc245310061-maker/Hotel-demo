@@ -1,10 +1,13 @@
+import json
 import os
 import re
 import time
 import threading
 from collections import defaultdict, deque
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
+from urllib.request import urlopen
 
 from openai import (
     APIConnectionError,
@@ -21,7 +24,9 @@ MAX_MESSAGE_LENGTH = 2000
 MAX_HISTORY_MESSAGES = 24
 MAX_HISTORY_CHARACTERS = 12000
 MAX_COMPLETION_TOKENS = 600
-PROVIDER_TIMEOUT_SECONDS = 20
+PROVIDER_TIMEOUT_SECONDS = 120
+OLLAMA_TIMEOUT_SECONDS = 3
+DEFAULT_OLLAMA_MODEL = 'qwen2.5:3b'
 RATE_LIMIT_REQUESTS = 10
 RATE_LIMIT_WINDOW_SECONDS = 60
 
@@ -37,11 +42,86 @@ class ChatError(Exception):
 
 
 def _config():
-    base_url = os.environ.get('OPENAI_BASE_URL', '').strip()
+    provider = os.environ.get('AI_PROVIDER', 'ollama').strip().lower()
+    if provider == 'ollama':
+        base_url = os.environ.get('OLLAMA_BASE_URL', '').strip()
+        return {
+            'provider': provider,
+            'api_key': '',
+            'model': os.environ.get('OLLAMA_MODEL', '').strip() or DEFAULT_OLLAMA_MODEL,
+            'base_url': (base_url or 'http://127.0.0.1:11434').rstrip('/'),
+        }
+    if provider == 'openai':
+        base_url = os.environ.get('OPENAI_BASE_URL', '').strip()
+        return {
+            'provider': provider,
+            'api_key': os.environ.get('OPENAI_API_KEY', '').strip(),
+            'model': os.environ.get('OPENAI_MODEL', '').strip() or 'gpt-4o-mini',
+            'base_url': (base_url or 'https://api.openai.com/v1').rstrip('/'),
+        }
+    raise ChatError('AI_PROVIDER chỉ nhận ollama hoặc openai. Hãy kiểm tra tệp .env.', 503)
+
+
+def _validate_base_url(base_url, provider):
+    parsed_url = urlparse(base_url)
+    if provider == 'ollama':
+        if parsed_url.scheme != 'http' or parsed_url.hostname not in {
+            '127.0.0.1',
+            'localhost',
+            '::1',
+        }:
+            raise ChatError(
+                'OLLAMA_BASE_URL cần trỏ đến Ollama trên máy này (localhost:11434).',
+                503,
+            )
+    elif parsed_url.scheme != 'https' or not parsed_url.netloc:
+        raise ChatError('OPENAI_BASE_URL phải là URL HTTPS hợp lệ.', 503)
+
+
+def _ensure_ollama_model(config):
+    tags_url = f"{config['base_url']}/api/tags"
+    try:
+        with urlopen(tags_url, timeout=OLLAMA_TIMEOUT_SECONDS) as response:
+            payload = json.loads(response.read().decode('utf-8'))
+    except (HTTPError, URLError, TimeoutError, OSError):
+        raise ChatError(
+            'Chưa kết nối được Ollama. Hãy cài Ollama, mở Ollama hoặc chạy start-demo.bat để được hướng dẫn.',
+            503,
+        ) from None
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        raise ChatError('Ollama trả về dữ liệu không hợp lệ. Hãy khởi động lại Ollama.', 502) from None
+
+    if not isinstance(payload, dict) or not isinstance(payload.get('models'), list):
+        raise ChatError('Ollama trả về danh sách mô hình không hợp lệ. Hãy khởi động lại Ollama.', 502)
+    installed_models = {
+        model.get('name')
+        for model in payload.get('models', [])
+        if isinstance(model, dict)
+    }
+    if config['model'] not in installed_models:
+        raise ChatError(
+            f"Chưa tải mô hình {config['model']}. Chạy start-demo.bat để tải mô hình tự động.",
+            503,
+        )
+
+
+def _client_credentials(config):
+    if config['provider'] == 'ollama':
+        _ensure_ollama_model(config)
+        _validate_base_url(config['base_url'], config['provider'])
+        return {
+            'api_key': 'ollama',
+            'base_url': f"{config['base_url']}/v1",
+        }
+    if not config['api_key']:
+        raise ChatError(
+            'Chế độ OpenAI cần API key. Chuyển AI_PROVIDER=ollama để dùng AI cục bộ.',
+            503,
+        )
+    _validate_base_url(config['base_url'], config['provider'])
     return {
-        'api_key': os.environ.get('OPENAI_API_KEY', '').strip(),
-        'model': os.environ.get('OPENAI_MODEL', '').strip() or 'gpt-4o-mini',
-        'base_url': (base_url or 'https://api.openai.com/v1').rstrip('/'),
+        'api_key': config['api_key'],
+        'base_url': config['base_url'],
     }
 
 
@@ -112,23 +192,17 @@ def _system_prompt():
 
 def _request_completion(messages):
     config = _config()
-    if not config['api_key']:
-        raise ChatError(
-            'Chat AI chưa được bật. Hãy thêm API key vào OPENAI_API_KEY trong tệp .env ở thư mục dự án, rồi khởi động lại ứng dụng.',
-            503,
-        )
-
-    parsed_base_url = urlparse(config['base_url'])
-    if parsed_base_url.scheme != 'https' or not parsed_base_url.netloc:
-        raise ChatError('OPENAI_BASE_URL phải là URL HTTPS hợp lệ.', 503)
+    credentials = _client_credentials(config)
 
     try:
         client = OpenAI(
-            api_key=config['api_key'],
-            base_url=config['base_url'],
+            **credentials,
             timeout=PROVIDER_TIMEOUT_SECONDS,
             max_retries=0,
         )
+        request_options = {}
+        if config['provider'] == 'ollama':
+            request_options['extra_body'] = {'options': {'num_ctx': 4096}}
         completion = client.chat.completions.create(
             model=config['model'],
             messages=[
@@ -137,6 +211,7 @@ def _request_completion(messages):
             ],
             max_tokens=MAX_COMPLETION_TOKENS,
             temperature=0.4,
+            **request_options,
         )
     except AuthenticationError:
         raise ChatError('API key không hợp lệ hoặc đã hết hạn. Hãy kiểm tra OPENAI_API_KEY trong tệp .env.', 502) from None
@@ -150,9 +225,16 @@ def _request_completion(messages):
     except APITimeoutError:
         raise ChatError('AI phản hồi quá thời gian chờ. Vui lòng thử lại sau.', 504) from None
     except APIConnectionError:
+        if config['provider'] == 'ollama':
+            raise ChatError('Mất kết nối với Ollama. Hãy kiểm tra Ollama đang chạy rồi thử lại.', 502) from None
         raise ChatError('Không thể kết nối với dịch vụ AI. Hãy kiểm tra mạng và cấu hình endpoint.', 502) from None
-    except APIStatusError:
-        raise ChatError('Dịch vụ AI từ chối yêu cầu. Hãy kiểm tra model và OPENAI_BASE_URL.', 502) from None
+    except APIStatusError as error:
+        if config['provider'] == 'ollama' and error.status_code == 404:
+            raise ChatError(
+                f"Mô hình {config['model']} chưa sẵn sàng. Chạy start-demo.bat để kiểm tra hoặc tải mô hình.",
+                503,
+            ) from None
+        raise ChatError('Dịch vụ AI từ chối yêu cầu. Hãy kiểm tra model và cấu hình endpoint.', 502) from None
 
     try:
         reply = completion.choices[0].message.content

@@ -1,7 +1,9 @@
 import json
 import os
+from io import BytesIO
 from types import SimpleNamespace
 from unittest.mock import patch
+from urllib.error import URLError
 
 from django.test import SimpleTestCase
 
@@ -18,9 +20,10 @@ class ChatApiTests(SimpleTestCase):
     def setUp(self):
         ai_service._REQUEST_TIMES.clear()
         environment = patch.dict(os.environ, {
-            'OPENAI_API_KEY': 'test-key',
-            'OPENAI_MODEL': 'test-model',
-            'OPENAI_BASE_URL': 'https://example.test/v1',
+            'AI_PROVIDER': 'ollama',
+            'OLLAMA_BASE_URL': 'http://127.0.0.1:11434',
+            'OLLAMA_MODEL': 'qwen2.5:3b',
+            'OPENAI_API_KEY': '',
         })
         environment.start()
         self.addCleanup(environment.stop)
@@ -42,31 +45,81 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('JSON', response.json()['message'])
 
-    @patch('django_server.urls.is_rate_limited', return_value=False)
-    @patch.dict(os.environ, {'OPENAI_API_KEY': ''})
-    def test_missing_api_key_returns_short_setup_guidance(self, _rate_limit):
-        response = self.client.post(
-            '/api/chat/',
-            data=json.dumps({'messages': [{'role': 'user', 'content': 'Xin chào'}]}),
-            content_type='application/json',
-        )
+    def test_default_provider_uses_local_model_without_openai_key(self):
+        with patch.dict(os.environ, {
+            'AI_PROVIDER': 'ollama',
+            'OLLAMA_MODEL': '',
+            'OLLAMA_BASE_URL': '',
+            'OPENAI_API_KEY': '',
+        }):
+            config = ai_service._config()
+            with patch('django_server.ai_service._ensure_ollama_model'):
+                credentials = ai_service._client_credentials(config)
 
-        self.assertEqual(response.status_code, 503)
-        self.assertIn('OPENAI_API_KEY', response.json()['message'])
-        self.assertIn('.env', response.json()['message'])
+        self.assertEqual(config['model'], 'qwen2.5:3b')
+        self.assertEqual(config['base_url'], 'http://127.0.0.1:11434')
+        self.assertEqual(credentials, {
+            'api_key': 'ollama',
+            'base_url': 'http://127.0.0.1:11434/v1',
+        })
 
-    @patch('django_server.urls.is_rate_limited', return_value=False)
-    @patch.dict(os.environ, {
-        'OPENAI_API_KEY': 'test-key',
-        'OPENAI_MODEL': 'test-model',
-        'OPENAI_BASE_URL': 'https://example.test/v1/',
-    })
+    @patch('django_server.ai_service.urlopen')
+    def test_installed_ollama_model_is_detected(self, urlopen):
+        response = BytesIO(json.dumps({
+            'models': [{'name': 'qwen2.5:3b'}],
+        }).encode())
+        urlopen.return_value.__enter__.return_value = response
+
+        ai_service._ensure_ollama_model(ai_service._config())
+
+        self.assertEqual(urlopen.call_args.args[0], 'http://127.0.0.1:11434/api/tags')
+
+    @patch('django_server.ai_service.urlopen')
+    def test_missing_ollama_model_is_not_reported_ready(self, urlopen):
+        response = BytesIO(json.dumps({'models': []}).encode())
+        urlopen.return_value.__enter__.return_value = response
+
+        with self.assertRaises(ai_service.ChatError) as error:
+            ai_service._ensure_ollama_model(ai_service._config())
+
+        self.assertEqual(error.exception.status, 503)
+        self.assertIn('qwen2.5:3b', error.exception.message)
+
+    @patch('django_server.ai_service.urlopen')
+    def test_invalid_ollama_model_response_is_reported(self, urlopen):
+        response = BytesIO(json.dumps({'unexpected': []}).encode())
+        urlopen.return_value.__enter__.return_value = response
+
+        with self.assertRaises(ai_service.ChatError) as error:
+            ai_service._ensure_ollama_model(ai_service._config())
+
+        self.assertEqual(error.exception.status, 502)
+        self.assertIn('danh sách mô hình', error.exception.message)
+
+    @patch('django_server.ai_service.urlopen', side_effect=URLError('offline'))
+    def test_stopped_ollama_returns_setup_guidance(self, _urlopen):
+        with self.assertRaises(ai_service.ChatError) as error:
+            ai_service._ensure_ollama_model(ai_service._config())
+
+        self.assertEqual(error.exception.status, 503)
+        self.assertIn('cài Ollama', error.exception.message)
+
+    def test_ollama_endpoint_must_be_local(self):
+        with self.assertRaises(ai_service.ChatError) as error:
+            ai_service._validate_base_url('https://remote.example/v1', 'ollama')
+
+        self.assertEqual(error.exception.status, 503)
+
+    @patch('django_server.ai_service._ensure_ollama_model')
     @patch('django_server.ai_service.OpenAI')
-    def test_chat_uses_sdk_configuration_and_full_history(self, openai_client, _rate_limit):
+    def test_ollama_chat_uses_sdk_model_and_conversation_history(
+        self,
+        openai_client,
+        ensure_model,
+    ):
         openai_client.return_value.chat.completions.create.return_value = provider_completion(
             'Xin chào!'
         )
-
         response = self.client.post(
             '/api/chat/',
             data=json.dumps({'messages': [
@@ -79,19 +132,53 @@ class ChatApiTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'reply': 'Xin chào!'})
+        ensure_model.assert_called_once()
+        openai_client.assert_called_once_with(
+            api_key='ollama',
+            base_url='http://127.0.0.1:11434/v1',
+            timeout=ai_service.PROVIDER_TIMEOUT_SECONDS,
+            max_retries=0,
+        )
+        call = openai_client.return_value.chat.completions.create.call_args.kwargs
+        self.assertEqual(call['model'], 'qwen2.5:3b')
+        self.assertEqual(call['extra_body'], {'options': {'num_ctx': 4096}})
+        self.assertEqual(call['messages'][-3:], [
+            {'role': 'user', 'content': 'Xin chào'},
+            {'role': 'assistant', 'content': 'Chào bạn!'},
+            {'role': 'user', 'content': 'Bạn vừa nói gì?'},
+        ])
+
+    @patch.dict(os.environ, {
+        'AI_PROVIDER': 'openai',
+        'OPENAI_API_KEY': 'test-key',
+        'OPENAI_MODEL': 'test-model',
+        'OPENAI_BASE_URL': 'https://example.test/v1/',
+    })
+    @patch('django_server.ai_service.OpenAI')
+    def test_optional_openai_provider_keeps_configured_settings(self, openai_client):
+        openai_client.return_value.chat.completions.create.return_value = provider_completion(
+            'Hello!'
+        )
+        reply = ai_service.get_chat_reply([{'role': 'user', 'content': 'Hello'}])
+
+        self.assertEqual(reply, 'Hello!')
         openai_client.assert_called_once_with(
             api_key='test-key',
             base_url='https://example.test/v1',
             timeout=ai_service.PROVIDER_TIMEOUT_SECONDS,
             max_retries=0,
         )
-        call = openai_client.return_value.chat.completions.create.call_args.kwargs
-        self.assertEqual(call['model'], 'test-model')
-        self.assertEqual(call['messages'][-3:], [
-            {'role': 'user', 'content': 'Xin chào'},
-            {'role': 'assistant', 'content': 'Chào bạn!'},
-            {'role': 'user', 'content': 'Bạn vừa nói gì?'},
-        ])
+        self.assertNotIn(
+            'extra_body',
+            openai_client.return_value.chat.completions.create.call_args.kwargs,
+        )
+
+    @patch.dict(os.environ, {'AI_PROVIDER': 'openai', 'OPENAI_API_KEY': ''})
+    def test_openai_mode_requires_key_but_default_ollama_does_not(self):
+        with self.assertRaises(ai_service.ChatError) as error:
+            ai_service._client_credentials(ai_service._config())
+
+        self.assertIn('AI_PROVIDER=ollama', error.exception.message)
 
     def test_chat_redacts_private_details_before_provider_call(self):
         messages = ai_service._parse_messages([{
@@ -114,61 +201,41 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(error.exception.status, 400)
 
     @patch('django_server.ai_service.OpenAI')
-    def test_invalid_key_error_is_explained_without_leaking_details(self, openai_client):
-        with patch('django_server.ai_service.AuthenticationError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError(
-                'provider error containing test-key'
-            )
+    def test_local_provider_connection_error_is_reported(self, openai_client):
+        openai_client.return_value.chat.completions.create.side_effect = (
+            ai_service.APIConnectionError(request=object())
+        )
+        with patch('django_server.ai_service._ensure_ollama_model'):
             with self.assertRaises(ai_service.ChatError) as error:
                 ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
 
         self.assertEqual(error.exception.status, 502)
-        self.assertIn('không hợp lệ', error.exception.message)
-        self.assertNotIn('test-key', error.exception.message)
+        self.assertIn('Ollama', error.exception.message)
 
     @patch('django_server.ai_service.OpenAI')
-    def test_provider_quota_error_is_explained(self, openai_client):
-        with patch('django_server.ai_service.RateLimitError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError(
-                'quota'
+    def test_model_not_found_is_reported_without_fake_success(self, openai_client):
+        class ModelNotFoundError(Exception):
+            status_code = 404
+
+        with patch('django_server.ai_service.APIStatusError', ModelNotFoundError):
+            openai_client.return_value.chat.completions.create.side_effect = ModelNotFoundError(
+                'model unavailable'
             )
-            with self.assertRaises(ai_service.ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
+            with patch('django_server.ai_service._ensure_ollama_model'):
+                with self.assertRaises(ai_service.ChatError) as error:
+                    ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
 
         self.assertEqual(error.exception.status, 503)
-        self.assertIn('hạn mức', error.exception.message)
-
-    @patch('django_server.ai_service.OpenAI')
-    def test_provider_network_error_is_reported(self, openai_client):
-        with patch('django_server.ai_service.APIConnectionError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError(
-                'offline'
-            )
-            with self.assertRaises(ai_service.ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
-
-        self.assertEqual(error.exception.status, 502)
-        self.assertIn('kết nối', error.exception.message)
-        self.assertNotIn('offline', error.exception.message)
-
-    @patch('django_server.ai_service.OpenAI')
-    def test_provider_timeout_is_reported(self, openai_client):
-        with patch('django_server.ai_service.APITimeoutError', RuntimeError):
-            openai_client.return_value.chat.completions.create.side_effect = RuntimeError()
-            with self.assertRaises(ai_service.ChatError) as error:
-                ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
-
-        self.assertEqual(error.exception.status, 504)
-        self.assertIn('thời gian chờ', error.exception.message)
+        self.assertIn('qwen2.5:3b', error.exception.message)
 
     @patch('django_server.ai_service.OpenAI')
     def test_empty_provider_reply_is_not_returned_as_success(self, openai_client):
         openai_client.return_value.chat.completions.create.return_value = provider_completion(
             '  '
         )
-
-        with self.assertRaises(ai_service.ChatError) as error:
-            ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
+        with patch('django_server.ai_service._ensure_ollama_model'):
+            with self.assertRaises(ai_service.ChatError) as error:
+                ai_service._request_completion([{'role': 'user', 'content': 'Chào'}])
 
         self.assertEqual(error.exception.status, 502)
         self.assertIn('trống', error.exception.message)

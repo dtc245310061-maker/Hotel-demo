@@ -4,22 +4,17 @@
 
 ## Chat AI
 
-Chat gửi lịch sử hội thoại qua `POST /api/chat/` đến lớp dịch vụ `django_server/ai_service.py`, gọi OpenAI SDK bằng cấu hình server-side (`OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL`). Django tự nạp `.env` ở thư mục gốc qua `python-dotenv` khi khởi động; biến môi trường hệ thống được ưu tiên. API giới hạn kích thước yêu cầu/lịch sử, số lần gọi, thời gian chờ và token đầu ra; một số thông tin liên hệ hoặc nhạy cảm được ẩn trước khi gửi. Khi thiếu/sai key, hết hạn mức, timeout hoặc mất kết nối, giao diện hiển thị lỗi phù hợp và cho phép thử lại; không có câu trả lời giả lập.
+Chat gửi lịch sử hội thoại qua `POST /api/chat/` đến `django_server/ai_service.py`. Mặc định, OpenAI SDK được trỏ vào endpoint tương thích OpenAI của Ollama trên localhost; mô hình mặc định `qwen2.5:3b` chạy cục bộ, không cần API key hosted. Ollama và mô hình được xác minh trước mỗi yêu cầu. Có thể tùy chọn `AI_PROVIDER=openai` cùng `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` để dùng dịch vụ hosted. Django tự nạp `.env` ở thư mục gốc qua `python-dotenv`; biến môi trường hệ thống được ưu tiên. API giới hạn kích thước yêu cầu/lịch sử, số lần gọi, thời gian chờ và token đầu ra; một số thông tin liên hệ hoặc nhạy cảm được ẩn trước khi gửi. Khi thiếu Ollama/mô hình, key hosted sai, hết hạn mức, timeout hoặc mất kết nối, giao diện hiển thị lỗi phù hợp và cho phép thử lại; không có câu trả lời giả lập.
 
 Dữ liệu phòng, giá và đặt phòng của demo hiện chỉ nằm trong `localStorage`; dự án chưa có database hay xác thực server-side. Vì vậy, API không gửi dữ liệu trình duyệt không đáng tin cậy cho mô hình và hướng dẫn AI không xác nhận thông tin khách sạn trực tiếp hoặc thực hiện thao tác nghiệp vụ.
 
+## Khởi chạy trên Windows
+
+`start-demo.bat` kiểm tra Python, thư viện, Ollama và mô hình. Khi thiếu mô hình, script tải về và chỉ khởi chạy website sau khi tải thành công. Cấu hình Ollama mặc định nằm trong `.env.example`.
+
 ## Verification
 
+- `py manage.py test django_server --noinput`: kiểm thử unit/API với Ollama mock.
 - `py manage.py check`: kiểm tra cấu hình Django.
-- `py manage.py runserver 127.0.0.1:8000`: chạy HTTP local.
-- Kiểm tra trình duyệt: đăng nhập quản trị/khách, điều hướng phòng, hỏi chatbot, tạo đặt phòng.
-
-## Skills.sh Evidence
-
-Áp dụng `frontend-design` cho giao diện; `tdd`/verification-first cho build và smoke flow.
-
-STATUS: PASS
-NEXT_INPUT: source code, tests, docs/04_implementation.md
-NEXT_PROMPT: prompts/05_review_testing.md
-TRACEABILITY_MATRIX_UPDATED: YES
-BACKTRACK_REQUIRED: NONE
+- Kiểm tra JavaScript inline bằng Node.js.
+- Chưa xác minh suy luận trên Ollama thật nếu Ollama chưa được cài trên máy.

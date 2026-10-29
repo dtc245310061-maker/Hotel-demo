@@ -1,35 +1,32 @@
 # Lumière Hotel AI Demo
 
-Bản demo được trình bày như website công khai của Lumière Hotel; khu quản trị vẫn có sau nút đăng nhập nhân viên. Django phục vụ trang tự chứa `dist/index.html` gồm giao diện, CSS và JavaScript; không cần Node.js, npm hay bước build frontend.
+Bản demo website Lumière Hotel dùng Django và một trang giao diện tự chứa `dist/index.html`. Không cần Node.js hay npm. Dữ liệu quản lý khách sạn vẫn là dữ liệu demo lưu trong trình duyệt; Chat AI chạy mô hình ngôn ngữ cục bộ bằng Ollama, không cần OpenAI API key và không tính phí API theo câu hỏi.
 
-## Chạy trên Windows
+## Chạy lần đầu trên Windows
 
-Cài Python 3.10 trở lên. Có thể mở `start-demo.bat` để chạy nhanh. Hoặc mở PowerShell tại thư mục dự án và chạy lần lượt:
+### 1. Cài Ollama
 
-```powershell
-py -m pip install -r requirements.txt
-```
+Tải Ollama từ [ollama.com/download/windows](https://ollama.com/download/windows), cài đặt rồi để Ollama chạy nền. Script bên dưới sẽ kiểm tra Ollama và tự tải mô hình nếu máy chưa có.
 
-Để bật Chat AI, tạo `.env` từ tệp mẫu (nếu chưa có), rồi mở tệp:
+Mô hình mặc định là `qwen2.5:3b`, chọn theo máy phát triển có RAM 16 GB và GPU RTX 3050 Ti 4 GB. Mô hình cần tải khoảng vài GB; tốc độ trả lời phụ thuộc máy và có thể chạy bằng CPU nếu GPU không đủ bộ nhớ. Đóng ứng dụng nặng trước khi dùng nếu máy còn ít RAM trống.
 
-```powershell
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-notepad .env
-```
+### 2. Cài Python và khởi động
 
-Trong `.env`, thay dòng `OPENAI_API_KEY=` bằng API key của bạn, ví dụ `OPENAI_API_KEY=sk-...`; không nhập key vào giao diện chat. Django tự đọc `.env` ở thư mục gốc khi khởi động nên chỉ cần cấu hình một lần. Có thể giữ nguyên `OPENAI_MODEL` và `OPENAI_BASE_URL` theo tệp mẫu hoặc thay bằng giá trị của nhà cung cấp tương thích. Không chia sẻ hoặc commit `.env`.
-
-Bạn cần tự cung cấp API key từ nhà cung cấp mô hình. Tài khoản API có thể cần bật billing hoặc có hạn mức sử dụng; điều kiện và chi phí do nhà cung cấp quyết định. Nếu chưa có key, ứng dụng vẫn chạy nhưng Chat AI sẽ yêu cầu cấu hình.
-
-Khởi động Django:
+Cài Python 3.10 trở lên, bảo đảm lệnh `py` dùng được, rồi mở `start-demo.bat` trong thư mục dự án. Hoặc mở PowerShell tại thư mục dự án và chạy một lệnh:
 
 ```powershell
-py manage.py runserver 127.0.0.1:8000
+.\start-demo.bat
 ```
 
-Mở `http://127.0.0.1:8000/`. Kiểm tra trạng thái Django tại `http://127.0.0.1:8000/api/health/`.
+Script sẽ tự tạo `.env` từ `.env.example` nếu cần, cài thư viện Python còn thiếu, khởi động Ollama, tải `qwen2.5:3b` nếu chưa có, kiểm tra Django rồi mở website tại `http://127.0.0.1:8000/`. Lần đầu có thể chờ trong lúc tải mô hình; chỉ sau khi tải thành công script mới báo AI sẵn sàng và mở website.
 
-Chat AI dùng OpenAI SDK với `OPENAI_MODEL` và `OPENAI_BASE_URL` từ `.env` hoặc biến môi trường. API key chỉ được đọc ở backend và không gửi xuống trình duyệt. Nếu key thiếu/sai, hết hạn mức hoặc mất kết nối, chat hiển thị hướng dẫn/lỗi thay vì câu trả lời giả lập.
+Nếu chưa cài Ollama, script sẽ dừng và hướng dẫn cài. Cần kết nối Internet trong lần đầu để cài thư viện/tải mô hình. Sau khi cài ban đầu, các lần chạy tiếp theo chỉ cần mở BAT, không cần nhập API key.
+
+### 3. Cấu hình tùy chọn
+
+Chế độ mặc định `AI_PROVIDER=ollama` dùng `OLLAMA_BASE_URL=http://127.0.0.1:11434` và `OLLAMA_MODEL=qwen2.5:3b`. Các giá trị mẫu nằm trong `.env`; có thể đổi `OLLAMA_MODEL` sang mô hình Ollama khác, rồi chạy lại BAT để tải mô hình đó.
+
+Người muốn dùng API hosted có thể đổi `AI_PROVIDER=openai` và cấu hình `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` trong `.env`. Chế độ này cần API key riêng và có thể phát sinh phí theo chính sách nhà cung cấp. Không nhập API key vào giao diện chat; không chia sẻ hoặc commit `.env`.
 
 ## Tài khoản đăng nhập demo
 
@@ -39,18 +36,14 @@ Chat AI dùng OpenAI SDK với `OPENAI_MODEL` và `OPENAI_BASE_URL` từ `.env` 
 | Nhân viên chính | Nguyễn Tuấn Anh | `nhanvien@lumiere.vn` | `Abc12345` |
 | Khách hàng | Nguyễn Minh Anh | `guest@lumiere.vn` | `guest123` |
 
-Lưu ý: các nhân viên ảo demo không cần tài khoản đăng nhập. Chúng chỉ xuất hiện trong danh sách quản lý nhân viên và có thể được admin cấp quyền truy cập trong mục nhân viên.
+Các tài khoản chỉ dùng để trình diễn local; không dùng lại mật khẩu này cho dịch vụ thật. Nhân viên ảo demo không cần đăng nhập.
 
-Các tài khoản trên chỉ dùng để trình diễn local; không dùng lại mật khẩu này cho dịch vụ thật.
+## Chức năng và giới hạn
 
-## Chức năng demo
+- Đăng nhập theo vai trò, dashboard, phòng, đặt phòng, dịch vụ, vận hành, báo cáo, hồ sơ và đánh giá.
+- Chat AI hỗ trợ câu hỏi mở, kiến thức chung và hội thoại tự nhiên; gửi các tin nhắn trước để duy trì ngữ cảnh trong phiên.
+- API chat chỉ kết nối tới Ollama trên localhost ở chế độ local. Tin nhắn giới hạn kích thước, lịch sử và tốc độ; một số thông tin liên hệ/nhạy cảm được ẩn trước khi gửi mô hình.
+- Dữ liệu phòng, giá, dịch vụ và đặt phòng của demo nằm trong `localStorage`, chưa có database hoặc xác thực server-side. Vì vậy AI không thể xác minh số phòng trống, giá hiện thời hay đặt phòng từ nguồn dữ liệu server và không thực hiện thao tác nghiệp vụ.
+- Đây là demo local, không dùng `runserver` cho môi trường production.
 
-- Đăng nhập theo vai trò, đăng ký khách hàng, mô phỏng quên mật khẩu, đăng xuất và cài đặt hồ sơ.
-- Dashboard, danh sách và trạng thái phòng; quản trị có thể thêm/sửa phòng và giá.
-- Đặt phòng, chọn ngày/số khách/dịch vụ, xem và hủy lượt đặt; quản trị có thể cập nhật trạng thái và trả phòng.
-- Bảng giá dịch vụ, yêu cầu vận hành, trạng thái thanh toán, doanh thu mẫu, nhân viên và đánh giá.
-- Lumière AI hỗ trợ hội thoại đa chủ đề và dùng lịch sử câu hỏi trong phiên để trả lời tiếp nối; giao diện có trạng thái chờ, báo lỗi, gửi lại và tạo cuộc trò chuyện mới.
-
-
-
-Chat sử dụng mô hình AI thật khi đã cấu hình API key hợp lệ và có kết nối nhà cung cấp. Các phòng, giá, đặt phòng và dịch vụ của demo vẫn chỉ lưu trong `localStorage`; Django chưa có cơ sở dữ liệu hoặc xác thực server-side nên AI không thể xác minh thông tin khách sạn trực tiếp, và sẽ nêu rõ giới hạn này thay vì tự bịa. Chat giới hạn tin nhắn, tốc độ gửi, thời gian chờ và loại bỏ một số dạng thông tin liên hệ/nhạy cảm trước khi gửi đến mô hình; không nhập thông tin cá nhân hoặc thanh toán vào chat. Tài khoản demo chỉ dùng cho trình diễn; Django chưa có email thật hay thanh toán. Không dùng `runserver` cho môi trường production.
+Kiểm tra Django tại `http://127.0.0.1:8000/api/health/`.
