@@ -6,7 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test import Client, SimpleTestCase
 
 from django_server import ai_service, documents
 from django_server.chat_errors import ChatError
@@ -21,6 +21,7 @@ def provider_completion(content):
 class ChatApiTests(SimpleTestCase):
     def setUp(self):
         ai_service._REQUEST_TIMES.clear()
+        ai_service._GLOBAL_REQUEST_TIMES.clear()
         self.environment = patch.dict(os.environ, {
             'AI_PROVIDER': 'openai',
             'OPENAI_API_KEY': 'test-key',
@@ -35,6 +36,33 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(self.client.get('/api/chat/').status_code, 405)
 
     @patch('django_server.urls.is_rate_limited', return_value=False)
+    def test_chat_requires_csrf_token_from_site(self, _rate_limit):
+        client = Client(enforce_csrf_checks=True)
+        response = client.post(
+            '/api/chat/',
+            data=json.dumps({'messages': [{'role': 'user', 'content': 'Hi'}]}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 403)
+
+    @patch('django_server.urls.is_rate_limited', return_value=False)
+    @patch('django_server.ai_service.OpenAI')
+    def test_chat_accepts_csrf_token_set_by_homepage(self, openai_client, _rate_limit):
+        openai_client.return_value.chat.completions.create.return_value = provider_completion(
+            'Xin chào!'
+        )
+        client = Client(enforce_csrf_checks=True)
+        client.get('/')
+        token = client.cookies['csrftoken'].value
+        response = client.post(
+            '/api/chat/',
+            data=json.dumps({'messages': [{'role': 'user', 'content': 'Xin chào'}]}),
+            content_type='application/json',
+            HTTP_X_CSRFTOKEN=token,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    @patch('django_server.urls.is_rate_limited', return_value=False)
     def test_chat_rejects_invalid_json(self, _rate_limit):
         response = self.client.post('/api/chat/', data='{', content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -45,7 +73,7 @@ class ChatApiTests(SimpleTestCase):
         with self.assertRaises(ChatError) as error:
             ai_service._request_completion([{'role': 'user', 'content': 'Xin chào'}])
         self.assertEqual(error.exception.status, 503)
-        self.assertIn('.env', error.exception.message)
+        self.assertIn('quản trị viên', error.exception.message)
 
     @patch('django_server.ai_service.OpenAI')
     def test_chat_calls_openai_with_config_and_full_conversation(self, openai_client):
@@ -195,6 +223,18 @@ class ChatApiTests(SimpleTestCase):
         self.assertTrue(ai_service.is_rate_limited('127.0.0.1', now=101))
         self.assertFalse(ai_service.is_rate_limited('127.0.0.1', now=161))
 
+    def test_global_daily_limit_blocks_requests_from_all_clients(self):
+        with patch.object(ai_service, 'DAILY_REQUEST_LIMIT', 2):
+            self.assertFalse(ai_service.is_rate_limited('client-one', now=100))
+            self.assertFalse(ai_service.is_rate_limited('client-two', now=101))
+            self.assertTrue(ai_service.is_rate_limited('client-three', now=102))
+            self.assertFalse(
+                ai_service.is_rate_limited(
+                    'client-three',
+                    now=100 + ai_service.DAILY_REQUEST_WINDOW_SECONDS,
+                )
+            )
+
 
 class KnowledgeDocumentTests(SimpleTestCase):
     def setUp(self):
@@ -308,3 +348,5 @@ class BasicEndpointTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         body = b''.join(response.streaming_content)
         self.assertIn(b'Lumi', body)
+        self.assertIn('csrftoken', response.cookies)
+        self.assertEqual(response['X-Frame-Options'], 'DENY')

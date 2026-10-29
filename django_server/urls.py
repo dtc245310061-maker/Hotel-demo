@@ -3,6 +3,7 @@ from pathlib import Path
 
 from django.http import FileResponse, JsonResponse
 from django.urls import path
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from django_server.ai_service import get_chat_reply, is_rate_limited
@@ -13,6 +14,7 @@ INDEX_FILE = BASE_DIR / 'dist' / 'index.html'
 MAX_REQUEST_BYTES = 64_000
 
 
+@ensure_csrf_cookie
 def index(request):
     return FileResponse(INDEX_FILE.open('rb'), content_type='text/html; charset=utf-8')
 
@@ -34,7 +36,7 @@ def chat(request):
         return JsonResponse({'message': 'Yêu cầu quá lớn. Hãy rút ngắn lịch sử hội thoại.'}, status=413)
     if is_rate_limited(request.META.get('REMOTE_ADDR', '')):
         return JsonResponse(
-            {'message': 'Bạn gửi câu hỏi quá nhanh. Vui lòng chờ một phút rồi thử lại.'},
+            {'message': 'Dịch vụ đang giới hạn lưu lượng. Vui lòng đợi rồi thử lại sau.'},
             status=429,
         )
     try:

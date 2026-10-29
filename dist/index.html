@@ -424,7 +424,10 @@
       try{
         const response=await fetch('/api/chat/',{
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{
+            'Content-Type':'application/json',
+            'X-CSRFToken':decodeURIComponent(document.cookie.split('; ').find(cookie=>cookie.startsWith('csrftoken='))?.split('=').slice(1).join('=')||'')
+          },
           body:JSON.stringify({messages:chatMessages.slice(-24).map(message=>({
             role:message.from==='ai'?'assistant':'user',
             content:message.text

@@ -26,9 +26,12 @@ MAX_COMPLETION_TOKENS = 600
 PROVIDER_TIMEOUT_SECONDS = 45
 RATE_LIMIT_REQUESTS = 10
 RATE_LIMIT_WINDOW_SECONDS = 60
+DAILY_REQUEST_LIMIT = int(os.environ.get('CHAT_DAILY_REQUEST_LIMIT', '100'))
+DAILY_REQUEST_WINDOW_SECONDS = 24 * 60 * 60
 
 _RATE_LIMIT_LOCK = threading.Lock()
 _REQUEST_TIMES = defaultdict(deque)
+_GLOBAL_REQUEST_TIMES = deque()
 
 
 def _config():
@@ -130,7 +133,7 @@ def _request_completion(messages):
     config = _config()
     if not config['api_key']:
         raise ChatError(
-            'Chat AI chưa có API key. Mở tệp .env trong thư mục dự án, điền OPENAI_API_KEY rồi khởi động lại.',
+            'Chat AI chưa được cấu hình trên máy chủ. Hãy báo quản trị viên bổ sung OPENAI_API_KEY.',
             503,
         )
     _validate_base_url(config['base_url'])
@@ -210,6 +213,11 @@ def get_chat_reply(raw_messages):
 def is_rate_limited(client_ip, now=None):
     now = time.monotonic() if now is None else now
     with _RATE_LIMIT_LOCK:
+        while (
+            _GLOBAL_REQUEST_TIMES
+            and now - _GLOBAL_REQUEST_TIMES[0] >= DAILY_REQUEST_WINDOW_SECONDS
+        ):
+            _GLOBAL_REQUEST_TIMES.popleft()
         for address in list(_REQUEST_TIMES):
             requests = _REQUEST_TIMES[address]
             while requests and now - requests[0] >= RATE_LIMIT_WINDOW_SECONDS:
@@ -217,10 +225,13 @@ def is_rate_limited(client_ip, now=None):
             if not requests:
                 del _REQUEST_TIMES[address]
 
+        if len(_GLOBAL_REQUEST_TIMES) >= DAILY_REQUEST_LIMIT:
+            return True
         if client_ip not in _REQUEST_TIMES and len(_REQUEST_TIMES) >= 4096:
             return True
         requests = _REQUEST_TIMES[client_ip]
         if len(requests) >= RATE_LIMIT_REQUESTS:
             return True
         requests.append(now)
+        _GLOBAL_REQUEST_TIMES.append(now)
         return False
