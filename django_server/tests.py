@@ -70,6 +70,64 @@ class ChatApiTests(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('JSON', response.json()['message'])
 
+    @patch('django_server.urls.is_rate_limited', return_value=False)
+    @patch('django_server.urls.get_chat_reply', return_value='Phòng L-212 phù hợp.')
+    def test_chat_endpoint_forwards_room_snapshot(self, get_chat_reply, _rate_limit):
+        rooms = [{
+            'id': 'L-212',
+            'type': 'Deluxe Garden',
+            'status': 'available',
+            'price': 720000,
+            'capacity': 2,
+        }]
+        response = self.client.post(
+            '/api/chat/',
+            data=json.dumps({
+                'messages': [{'role': 'user', 'content': 'Phòng nào phù hợp?'}],
+                'rooms': rooms,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        get_chat_reply.assert_called_once_with(
+            [{'role': 'user', 'content': 'Phòng nào phù hợp?'}],
+            rooms,
+        )
+
+    @patch('django_server.urls.is_rate_limited', return_value=False)
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    def test_chat_endpoint_returns_room_fallback_when_gemini_is_limited(
+        self,
+        _find_passages,
+        _request_completion,
+        _rate_limit,
+    ):
+        response = self.client.post(
+            '/api/chat/',
+            data=json.dumps({
+                'messages': [{
+                    'role': 'user',
+                    'content': 'Đi 2 người với tài chính 1 triệu ở phòng nào?',
+                }],
+                'rooms': [{
+                    'id': 'L-212',
+                    'type': 'Deluxe Garden',
+                    'status': 'available',
+                    'price': 720000,
+                    'capacity': 2,
+                }],
+            }, ensure_ascii=False),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('L-212', response.json()['reply'])
+
     @patch.dict(os.environ, {'AI_PROVIDER': 'gemini', 'GEMINI_API_KEY': ''})
     def test_missing_api_key_returns_clear_setup_error(self):
         with self.assertRaises(ChatError) as error:
@@ -130,6 +188,231 @@ class ChatApiTests(SimpleTestCase):
             config = ai_service._config()
         self.assertEqual(config['provider'], 'gemini')
         self.assertEqual(config['model'], 'gemini-2.5-flash')
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch('django_server.ai_service._request_completion')
+    def test_room_advice_includes_matching_demo_room_data(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        request_completion.return_value = 'Phòng L-212 phù hợp: Deluxe Garden, 720.000đ/đêm, tối đa 2 khách.'
+        rooms = [
+            {'id': 'L-203', 'type': 'Deluxe Garden', 'status': 'occupied', 'price': 700000, 'capacity': 2},
+            {'id': 'L-212', 'type': 'Deluxe Garden', 'status': 'available', 'price': 720000, 'capacity': 2},
+            {'id': 'L-306', 'type': 'Family Garden', 'status': 'available', 'price': 1100000, 'capacity': 4},
+        ]
+
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Đi 2 người với tài chính 1 triệu ở phòng nào?'}],
+            rooms,
+        )
+
+        self.assertIn('L-212', reply)
+        prompt = request_completion.call_args.args[0][0]['content']
+        self.assertIn('"status":"available"', prompt)
+        self.assertIn('"price":720000', prompt)
+        self.assertIn('"capacity":2', prompt)
+        self.assertIn('"status":"occupied"', prompt)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch('django_server.ai_service._request_completion')
+    def test_room_advice_can_report_no_matching_available_room(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        request_completion.return_value = 'Không có phòng còn trống nào đáp ứng đồng thời sức chứa và ngân sách này.'
+        rooms = [
+            {'id': 'L-401', 'type': 'Family Suite', 'status': 'available', 'price': 1350000, 'capacity': 4},
+            {'id': 'L-203', 'type': 'Deluxe Garden', 'status': 'occupied', 'price': 700000, 'capacity': 2},
+        ]
+
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Tìm phòng cho 2 người dưới 600.000 đồng'}],
+            rooms,
+        )
+
+        self.assertIn('Không có phòng', reply)
+        prompt = request_completion.call_args.args[0][0]['content']
+        self.assertIn('"price":1350000', prompt)
+        self.assertIn('status phải là "available"', prompt)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    def test_room_advice_falls_back_to_matching_snapshot_when_gemini_is_limited(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        rooms = [
+            {'id': 'L-203', 'type': 'Deluxe Garden', 'status': 'occupied', 'price': 650000, 'capacity': 2},
+            {'id': 'L-212', 'type': 'Deluxe Garden', 'status': 'available', 'price': 720000, 'capacity': 2},
+            {'id': 'L-306', 'type': 'Family Garden', 'status': 'available', 'price': 1100000, 'capacity': 4},
+        ]
+
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Đi 2 người với tài chính 1 triệu ở phòng nào?'}],
+            rooms,
+        )
+
+        self.assertIn('L-212', reply)
+        self.assertIn('720.000 đồng/đêm', reply)
+        self.assertNotIn('L-203', reply)
+        self.assertNotIn('L-306', reply)
+        request_completion.assert_called_once()
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    def test_room_advice_fallback_reports_when_no_room_matches(
+        self,
+        _request_completion,
+        _find_passages,
+    ):
+        rooms = [
+            {'id': 'L-212', 'type': 'Deluxe Garden', 'status': 'available', 'price': 720000, 'capacity': 2},
+            {'id': 'L-203', 'type': 'Deluxe Garden', 'status': 'occupied', 'price': 400000, 'capacity': 2},
+        ]
+
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Tìm phòng cho 2 người dưới 500.000 đồng.'}],
+            rooms,
+        )
+
+        self.assertIn('chưa có phòng available', reply)
+        self.assertNotIn('L-203', reply)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    def test_room_advice_fallback_reports_empty_snapshot(
+        self,
+        _request_completion,
+        _find_passages,
+    ):
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Phòng nào phù hợp cho 2 người với ngân sách 1 triệu?'}],
+            [],
+        )
+
+        self.assertIn('không có dữ liệu phòng', reply)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    def test_room_advice_fallback_asks_for_missing_budget(
+        self,
+        _request_completion,
+        _find_passages,
+    ):
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Đi 2 người thì phòng nào phù hợp?'}],
+            [{
+                'id': 'L-212',
+                'type': 'Deluxe Garden',
+                'status': 'available',
+                'price': 720000,
+                'capacity': 2,
+            }],
+        )
+
+        self.assertIn('ngân sách tối đa', reply)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch(
+        'django_server.ai_service._request_completion',
+        side_effect=ChatError('Gemini quota exhausted.', 429),
+    )
+    def test_non_room_question_does_not_use_room_fallback(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        with self.assertRaises(ChatError) as error:
+            ai_service.get_chat_reply(
+                [{'role': 'user', 'content': 'Giải phương trình 2x + 5 = 17.'}],
+                [{
+                    'id': 'L-212',
+                    'type': 'Deluxe Garden',
+                    'status': 'available',
+                    'price': 720000,
+                    'capacity': 2,
+                }],
+            )
+
+        self.assertEqual(error.exception.status, 429)
+        request_completion.assert_called_once()
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch('django_server.ai_service._request_completion')
+    def test_empty_room_snapshot_is_explicitly_passed_for_room_question(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        request_completion.return_value = 'Hiện không có dữ liệu phòng để tư vấn.'
+
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Phòng nào phù hợp cho 2 người?'}],
+            [],
+        )
+
+        self.assertIn('không có dữ liệu phòng', reply)
+        self.assertIn('[]', request_completion.call_args.args[0][0]['content'])
+
+    def test_room_snapshot_rejects_missing_or_invalid_fields(self):
+        with self.assertRaises(ChatError) as error:
+            ai_service._parse_room_snapshot([{
+                'id': 'L-212',
+                'type': 'Deluxe Garden',
+                'status': 'available',
+                'price': '720000',
+                'capacity': 2,
+            }])
+        self.assertEqual(error.exception.status, 400)
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch('django_server.ai_service._request_completion')
+    def test_room_data_is_not_parsed_for_a_general_question(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        request_completion.return_value = 'Nghiệm là x = 6.'
+        reply = ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Giải phương trình 2x + 5 = 17.'}],
+            [{'incomplete': 'not room data'}],
+        )
+
+        self.assertEqual(reply, 'Nghiệm là x = 6.')
+
+    @patch('django_server.ai_service.find_relevant_passages', return_value=[])
+    @patch('django_server.ai_service._request_completion')
+    def test_non_room_question_does_not_send_room_snapshot(
+        self,
+        request_completion,
+        _find_passages,
+    ):
+        request_completion.return_value = '2x + 5 = 17 nên x = 6.'
+        ai_service.get_chat_reply(
+            [{'role': 'user', 'content': 'Giải phương trình 2x + 5 = 17.'}],
+            [{'id': 'L-212', 'type': 'Deluxe Garden', 'status': 'available', 'price': 720000, 'capacity': 2}],
+        )
+
+        self.assertEqual(
+            request_completion.call_args.args[0],
+            [{'role': 'user', 'content': 'Giải phương trình 2x + 5 = 17.'}],
+        )
 
     def test_system_prompt_supports_math_programming_and_open_questions(self):
         prompt = ai_service._system_prompt()
@@ -217,8 +500,10 @@ class ChatApiTests(SimpleTestCase):
         )
         with self.assertRaises(ChatError) as error:
             ai_service._request_completion([{'role': 'user', 'content': 'Hi'}])
-        self.assertEqual(error.exception.status, 503)
-        self.assertIn('hết hạn mức', error.exception.message)
+        self.assertEqual(error.exception.status, 429)
+        self.assertIn('quota', error.exception.message)
+        self.assertIn('đợi trước khi thử lại', error.exception.message)
+        gemini_client.return_value.models.generate_content.assert_called_once()
 
     @patch('django_server.ai_service.genai.Client')
     def test_connection_error_is_reported(self, gemini_client):
