@@ -13,6 +13,16 @@ py --version
 
 Lần đầu, BAT tạo `.env`, cài thư viện còn thiếu và mở Notepad. Trong [Google AI Studio](https://aistudio.google.com/apikey), đăng nhập Google rồi tạo API key. Chỉ tiếp tục nếu tài khoản hiển thị quota Free; không bật billing nếu được yêu cầu. Trong Notepad, thêm key sau `GEMINI_API_KEY=` (không có dấu ngoặc kép), lưu file rồi đóng. BAT mở website tại [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Mở Chat AI; những lần sau chỉ cần chạy lại BAT.
 
+## Tài khoản đăng nhập demo
+
+| Vai trò | Email | Mật khẩu |
+|---|---|---|
+| Quản trị | `admin@lumiere.vn` | `admin123` |
+| Nhân viên | `nhanvien@lumiere.vn` | `Abc12345` |
+| Khách | `guest@lumiere.vn` | `guest123` |
+
+Đây là thông tin đăng nhập mẫu được khai báo trong mã giao diện. Xác thực và dữ liệu demo lưu trên trình duyệt (`localStorage`); không dùng các tài khoản này cho dữ liệu thật.
+
 ## Lưu ý
 
 - Mặc định dùng `gemini-2.5-flash`. Google chỉ cấp Free Tier cho một số model/dự án đủ điều kiện; không thể đảm bảo tài khoản có quota miễn phí hoặc quota còn lại. Kiểm tra trong Google AI Studio và [bảng giá](https://ai.google.dev/gemini-api/docs/pricing); không bật billing, nếu được yêu cầu thanh toán thì dừng lại.
